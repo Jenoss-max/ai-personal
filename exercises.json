@@ -1,0 +1,44 @@
+{
+  "squat": {
+    "label": "Squat",
+    "file": "squat.json",
+    "video": "squat.mp4",
+    "image": "squat.jpg",
+    "rep": "squat"
+  },
+  "reverse_lunge": {
+    "label": "Reverse Lunge",
+    "file": "reverse_lunge.json",
+    "video": "reverse_lunge.mp4",
+    "image": "reverse_lunge.jpg",
+    "rep": "squat"
+  },
+  "pushup": {
+    "label": "Push Up",
+    "file": "pushup.json",
+    "video": "pushup.mp4",
+    "image": "pushup.jpg",
+    "rep": "pushup"
+  },
+  "knee_pushup": {
+    "label": "Knee Push Up",
+    "file": "knee_pushup.json",
+    "video": "knee_pushup.mp4",
+    "image": "knee_pushup.jpg",
+    "rep": "pushup"
+  },
+  "plank": {
+    "label": "Plank",
+    "file": "plank.json",
+    "video": "plank.mp4",
+    "image": "plank.jpg",
+    "rep": "hold"
+  },
+  "bird_dog": {
+    "label": "Bird Dog",
+    "file": "bird_dog.json",
+    "video": "bird_dog.mp4",
+    "image": "bird_dog.jpg",
+    "rep": "squat"
+  }
+}

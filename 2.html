@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Registration - AI Exercise</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"]
+                    },
+                    colors: {
+                        brand: {
+                            blue: '#0B2447',
+                            accent: '#19376D',
+                            orange: '#F97316',
+                            light: '#E6F0FF',
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'input': '0 2px 6px -1px rgba(0, 0, 0, 0.05)',
+                    }
+                }
+            }
+        }
+    </script>
+<style type="text/tailwindcss">
+        :root {
+            --ios-safe-bottom: 34px;
+        }
+        body {
+            background-color: #f8fafc;
+            -webkit-tap-highlight-color: transparent;
+        }
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .phone-container {
+            width: 100%;
+            max-width: 430px;
+            margin: 0 auto;
+            min-height: 100dvh;
+            position: relative;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 50px rgba(0,0,0,0.05);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-display antialiased text-slate-900">
+<div class="phone-container">
+<header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 px-6 py-4 flex items-center justify-between">
+<button class="flex items-center justify-center p-2 rounded-full hover:bg-gray-50 transition-colors text-brand-blue">
+<span class="material-symbols-outlined text-2xl font-bold">arrow_back</span>
+</button>
+<div class="flex items-center gap-1 select-none">
+<span class="material-symbols-outlined text-blue-600 text-3xl" style="font-variation-settings: 'FILL' 1, 'wght' 700;">fitness_center</span>
+<div class="flex flex-col leading-none">
+<span class="text-2xl font-black italic tracking-tighter text-blue-600 uppercase">AI</span>
+</div>
+<span class="text-2xl font-black italic tracking-tighter text-brand-orange uppercase">EXERCISE</span>
+</div>
+<div class="w-10"></div>
+</header>
+<main class="flex-1 overflow-y-auto px-6 pt-6 pb-32">
+<div class="mb-8">
+<h1 class="text-2xl font-bold text-brand-blue mb-2">Create Profile</h1>
+<p class="text-gray-500 text-sm font-light">
+                    Let's customize your AI workout plan for better tracking accuracy.
+                </p>
+</div>
+<form class="flex flex-col gap-5" onsubmit="event.preventDefault();">
+<div class="space-y-1.5">
+<label class="block text-[10px] font-bold uppercase tracking-widest text-brand-blue/60 ml-1">USERNAME</label>
+<div class="relative group">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-brand-orange group-focus-within:text-brand-blue transition-colors">person</span>
+</div>
+<input class="w-full h-14 pl-12 pr-4 bg-gray-50 border border-gray-100 rounded-2xl text-base text-brand-blue font-medium placeholder-gray-400 focus:bg-white focus:border-brand-orange focus:ring-1 focus:ring-brand-orange transition-all shadow-input" id="fullName" placeholder="e.g. John Doe" type="text"/>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="space-y-1.5">
+<label class="block text-[10px] font-bold uppercase tracking-widest text-brand-blue/60 ml-1">Age</label>
+<div class="relative">
+<input class="w-full h-14 px-4 bg-gray-50 border border-gray-100 rounded-2xl text-lg text-center font-bold text-brand-blue placeholder-gray-300 focus:bg-white focus:border-brand-orange focus:ring-1 focus:ring-brand-orange transition-all shadow-input" id="age" placeholder="25" type="number"/>
+</div>
+</div>
+<div class="space-y-1.5">
+<label class="block text-[10px] font-bold uppercase tracking-widest text-brand-blue/60 ml-1">Gender</label>
+<div class="h-14 p-1 flex border border-gray-100 rounded-2xl bg-gray-50 shadow-input">
+<button class="flex-1 h-full rounded-xl bg-white text-brand-blue font-bold text-xs shadow-sm transition-all border border-gray-100" data-gender="M" type="button">M</button>
+<button class="flex-1 h-full rounded-xl bg-transparent text-gray-400 font-medium text-xs hover:text-brand-blue transition-all" data-gender="M" type="button">F</button>
+<button class="flex-1 h-full rounded-xl bg-transparent text-gray-400 font-medium text-xs hover:text-brand-blue transition-all" data-gender="M" type="button">X</button>
+
+</div>
+</div>
+</div>
+<div class="space-y-1.5">
+<label class="block text-[10px] font-bold uppercase tracking-widest text-brand-blue/60 ml-1">Height</label>
+<div class="relative flex items-center group">
+<span class="material-symbols-outlined absolute left-4 text-brand-orange group-focus-within:text-brand-blue transition-colors">height</span>
+<input class="w-full h-14 pl-12 pr-24 bg-gray-50 border border-gray-100 rounded-2xl text-lg font-bold text-brand-blue placeholder-gray-300 focus:bg-white focus:border-brand-orange focus:ring-1 focus:ring-brand-orange transition-all shadow-input" id="height" placeholder="175" type="number"/>
+<div class="absolute right-2 top-2 bottom-2 flex bg-white rounded-xl border border-gray-100 p-1">
+<button class="px-3 h-full rounded-lg text-[10px] font-bold text-white bg-brand-orange shadow-sm" type="button">CM</button>
+</div>
+</div>
+</div>
+<div class="space-y-1.5">
+<label class="block text-[10px] font-bold uppercase tracking-widest text-brand-blue/60 ml-1">Current Weight</label>
+<div class="relative flex items-center group">
+<span class="material-symbols-outlined absolute left-4 text-brand-orange group-focus-within:text-brand-blue transition-colors">monitor_weight</span>
+<input class="w-full h-14 pl-12 pr-24 bg-gray-50 border border-gray-100 rounded-2xl text-lg font-bold text-brand-blue placeholder-gray-300 focus:bg-white focus:border-brand-orange focus:ring-1 focus:ring-brand-orange transition-all shadow-input" id="currentWeight" placeholder="70.0" type="number"/>
+<div class="absolute right-2 top-2 bottom-2 flex bg-white rounded-xl border border-gray-100 p-1">
+<button class="px-3 h-full rounded-lg text-[10px] font-bold text-white bg-brand-orange shadow-sm" type="button">KG</button>
+</div>
+</div>
+</div>
+<div class="mt-2 p-5 rounded-3xl bg-gradient-to-br from-blue-50/50 to-white border border-blue-100 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<label class="text-xs font-bold text-brand-blue flex items-center gap-2 uppercase tracking-wide">
+<div class="p-1.5 bg-brand-orange/10 rounded-lg">
+<span class="material-symbols-outlined text-brand-orange text-lg">flag</span>
+</div>
+                            Target Goal Weight
+                        </label>
+</div>
+<div class="relative flex items-center">
+<input class="w-full h-16 pl-4 pr-16 bg-white border-2 border-brand-blue/10 rounded-2xl text-3xl font-black text-brand-blue placeholder-gray-200 focus:outline-none focus:border-brand-orange transition-all text-center" id="targetWeight" placeholder="65.0" type="number"/>
+<div class="absolute right-6 top-0 bottom-0 flex items-center pointer-events-none">
+<span class="text-sm font-bold text-gray-400">KG</span>
+</div>
+</div>
+</div>
+<button id="completeProfileBtn" class="w-full h-16 mt-4 bg-brand-blue hover:bg-brand-accent text-white font-bold text-base uppercase tracking-widest rounded-2xl flex items-center justify-center gap-3 transition-all shadow-xl shadow-blue-900/10 active:scale-[0.98]" type="button">
+                    Complete Profile
+                    <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</form>
+</main>
+<nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-white border-t border-gray-100 px-10 pt-3 pb-[calc(10px+var(--ios-safe-bottom))] z-50 flex justify-between items-center shadow-[0_-8px_30px_rgba(0,0,0,0.06)]">
+<button onclick="location.href='5.html'"
+  class="flex flex-col items-center gap-1 nav-active">
+  <span class="material-symbols-outlined">fitness_center</span>
+  <span class="text-[10px] font-bold">Workouts</span>
+</button>
+
+<button onclick="location.href='grap.html'"
+  class="flex flex-col items-center gap-1 group text-slate-400">
+  <span class="material-symbols-outlined">analytics</span>
+  <span class="text-[10px] font-bold">Analytics</span>
+</button>
+
+<button onclick="location.href='1.html'"
+  class="flex flex-col items-center gap-1 group text-slate-400">
+  <span class="material-symbols-outlined">person</span>
+  <span class="text-[10px] font-bold">Profile</span>
+</button>
+
+</nav>
+</div>
+<script>
+/* =========================
+   GLOBAL KEY
+========================= */
+const APP_KEY = "aiExerciseApp";
+
+/* =========================
+   Gender Selection
+========================= */
+let selectedGender = "";
+
+document.querySelectorAll("[data-gender]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    selectedGender = btn.dataset.gender;
+
+    document.querySelectorAll("[data-gender]").forEach(b => {
+      b.classList.remove("bg-white", "text-brand-blue", "shadow-sm");
+      b.classList.add("bg-transparent", "text-gray-400");
+    });
+
+    btn.classList.add("bg-white", "text-brand-blue", "shadow-sm");
+    btn.classList.remove("bg-transparent", "text-gray-400");
+  });
+});
+
+/* =========================
+   Complete Profile
+========================= */
+document.getElementById("completeProfileBtn").addEventListener("click", () => {
+  const name = document.getElementById("fullName").value.trim();
+  const age = Number(document.getElementById("age").value);
+  const height = Number(document.getElementById("height").value);
+  const weight = Number(document.getElementById("currentWeight").value);
+  const goalWeight = Number(document.getElementById("targetWeight").value);
+
+  if (!name || !age || !height || !weight || !goalWeight || !selectedGender) {
+    alert("Please complete all fields");
+    return;
+  }
+
+  const bmi = (weight / Math.pow(height / 100, 2)).toFixed(1);
+
+  const appData = {
+    user: {
+      name,
+      age,
+      gender: selectedGender,
+      height,
+      weight,
+      goalWeight,
+      bmi
+    }
+  };
+
+  localStorage.setItem(APP_KEY, JSON.stringify(appData));
+
+  // 👉 ไปหน้า Home
+  window.location.href = "5.html";
+});
+</script>
+
+</body></html>

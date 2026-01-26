@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Exercise Setup - Final UI</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"]
+                    },
+                    colors: {
+                        brand: {
+                            orange: '#FF5E00',
+                            blue: '#0047AB',
+                            'blue-light': '#E8F1FF',
+                            'blue-border': '#D1E3FF'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+<style type="text/tailwindcss">
+        .safe-area-bottom {
+            padding-bottom: calc(env(safe-area-inset-bottom) + 80px);
+        }
+        body {
+            background-color: #F8F9FB;
+        }
+        .ios-tab-bar {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-display antialiased flex flex-col items-center text-[#1A1A1A] min-h-screen">
+<div class="w-full max-w-[390px] min-h-screen bg-white flex flex-col relative shadow-2xl overflow-hidden">
+<header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 px-6 py-4 flex items-center">
+<button class="p-1 -ml-2 text-gray-800 hover:bg-gray-100 rounded-full transition-colors">
+<span class="material-symbols-outlined text-2xl">chevron_left</span>
+</button>
+<h1 class="flex-1 text-center font-bold text-lg mr-6">Exercise Setup</h1>
+</header>
+<main class="flex-1 overflow-y-auto pb-48">
+<div class="w-full aspect-video relative group overflow-hidden">
+<img alt="Athlete training" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBcDonCiUuJxMcS8ZiL3z8ytfpxRgpBAdm9BZu8laBD600gwi0eim3b0FsV_rfemHIlwF4FmXVFf4TavydwuAFkIZMdA1nsGxY3HE_FSUaeSbAPEtRopapwhruGXlbooinXqV7ermZh04bd6k8CmPFHIE_JddEk9KQcrBfCja01NI5_TKWEW2Jk6-ia0KbcIK4BH3RqVndwkXkppgYkHBREpGJw0pgflNJb24tgIR4aE9QTsf_ti0TFr6mpn20JT7EQi3DV3Zd6Lvc"/>
+<div class="absolute inset-0 bg-black/20 flex items-center justify-center">
+<button class="w-16 h-16 bg-brand-orange rounded-full flex items-center justify-center shadow-xl shadow-brand-orange/40 active:scale-95 transition-transform group-hover:scale-110">
+<span class="material-symbols-outlined text-4xl text-white fill-1" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</div>
+<div class="absolute bottom-4 left-6 bg-white/95 px-3 py-1.5 rounded-full text-[10px] font-extrabold uppercase tracking-widest text-brand-orange shadow-lg flex items-center gap-1">
+<span class="w-1.5 h-1.5 bg-brand-orange rounded-full animate-pulse"></span>
+                Trainer Demo
+            </div>
+</div>
+<div class="px-6 py-8 space-y-10">
+<section>
+<div class="flex items-end justify-between mb-5">
+<div>
+<h2 class="text-[11px] font-black text-brand-orange uppercase tracking-widest mb-1">Workout Volume</h2>
+<h3 class="text-xl font-extrabold text-[#1A1A1A]">Number of Sets</h3>
+</div>
+<div class="text-4xl font-black text-brand-orange">4</div>
+</div>
+<div class="flex items-center justify-between bg-gray-50 rounded-[24px] p-3 border border-gray-100">
+<button class="w-14 h-14 flex items-center justify-center bg-brand-orange text-white rounded-2xl shadow-lg shadow-brand-orange/30 active:scale-90 transition-all">
+<span class="material-symbols-outlined font-bold text-2xl">remove</span>
+</button>
+<div class="flex-1 flex justify-center px-4">
+<div class="flex gap-2.5">
+<div class="w-4 h-4 rounded-full bg-brand-orange shadow-sm"></div>
+<div class="w-4 h-4 rounded-full bg-brand-orange shadow-sm"></div>
+<div class="w-4 h-4 rounded-full bg-brand-orange shadow-sm"></div>
+<div class="w-4 h-4 rounded-full bg-brand-orange shadow-sm"></div>
+<div class="w-4 h-4 rounded-full bg-gray-300"></div>
+</div>
+</div>
+<button class="w-14 h-14 flex items-center justify-center bg-brand-orange text-white rounded-2xl shadow-lg shadow-brand-orange/30 active:scale-90 transition-all">
+<span class="material-symbols-outlined font-bold text-2xl">add</span>
+</button>
+</div>
+</section>
+<section>
+<div class="mb-5">
+<h2 class="text-[11px] font-black text-brand-blue uppercase tracking-widest mb-1">Set Intensity</h2>
+<h3 class="text-xl font-extrabold text-[#1A1A1A]">Time Per Set</h3>
+</div>
+<div class="grid grid-cols-3 gap-3">
+<button class="flex flex-col items-center justify-center py-5 border-2 border-brand-blue-border rounded-2xl bg-white hover:border-brand-blue active:scale-[0.97] transition-all">
+<span class="text-2xl font-black">30</span>
+<span class="text-[10px] font-extrabold text-gray-80 uppercase tracking-widest">Sec</span>
+</button>
+<button class="flex flex-col items-center justify-center py-5 border-2 border-brand-blue-border rounded-2xl bg-white hover:border-brand-blue active:scale-[0.97] transition-all">
+<span class="text-2xl font-black">45</span>
+<span class="text-[10px] font-extrabold text-gray-80 uppercase tracking-widest">Sec</span>
+</button>
+<button class="flex flex-col items-center justify-center py-5 border-2 border-brand-blue-border rounded-2xl bg-white hover:border-brand-blue active:scale-[0.97] transition-all">
+<span class="text-2xl font-black">60</span>
+<span class="text-[10px] font-extrabold text-gray-80 uppercase tracking-widest">Sec</span>
+</button>
+<button class="flex flex-col items-center justify-center py-5 border-2 border-brand-blue-border rounded-2xl bg-white hover:border-brand-blue active:scale-[0.97] transition-all">
+<span class="text-2xl font-black">90</span>
+<span class="text-[10px] font-extrabold text-gray-80 uppercase tracking-widest">Sec</span>
+</button>
+<button class="flex flex-col items-center justify-center py-5 border-2 border-brand-blue-border rounded-2xl bg-white hover:border-brand-blue active:scale-[0.97] transition-all">
+<span class="text-2xl font-black">120</span>
+<span class="text-[10px] font-extrabold text-gray-80 uppercase tracking-widest">Sec</span>
+</button>
+<button class="flex flex-col items-center justify-center py-5 border-2 border-brand-blue-border rounded-2xl bg-white hover:border-brand-blue active:scale-[0.97] transition-all">
+<span class="text-2xl font-black">180</span>
+<span class="text-[10px] font-extrabold text-gray-80 uppercase tracking-widest">Sec</span>
+</button>
+</div>
+</section>
+</div>
+</main>
+<div class="absolute bottom-0 left-0 w-full z-50">
+<div class="px-6 pb-6 pt-4 bg-white/90 backdrop-blur-md">
+<button class="w-full bg-brand-orange text-white py-4 rounded-2xl font-black text-lg uppercase tracking-[0.1em] flex items-center justify-center gap-3 shadow-xl shadow-brand-orange/30 active:scale-[0.98] transition-all">
+                Start Workout
+                <span class="material-symbols-outlined fill-1" style="font-variation-settings: 'FILL' 1;">play_circle</span>
+</button>
+</div>
+<nav class="ios-tab-bar bg-white border-t border-gray-100 flex items-center justify-around py-3 px-4">
+<button onclick="location.href='5.html'"
+  class="flex flex-col items-center gap-1 nav-active">
+  <span class="material-symbols-outlined">fitness_center</span>
+  <span class="text-[10px] font-bold">Workouts</span>
+</button>
+
+<button onclick="location.href='grap.html'"
+  class="flex flex-col items-center gap-1 group text-slate-400">
+  <span class="material-symbols-outlined">analytics</span>
+  <span class="text-[10px] font-bold">Analytics</span>
+</button>
+
+<button onclick="location.href='1.html'"
+  class="flex flex-col items-center gap-1 group text-slate-400">
+  <span class="material-symbols-outlined">person</span>
+  <span class="text-[10px] font-bold">Profile</span>
+</button>
+
+</nav>
+</div>
+</div>
+<script>
+/* =====================================================
+   Exercise Setup – CLEAN & STABLE
+   (NO DESIGN CHANGE / SINGLE SCRIPT)
+===================================================== */
+
+const APP_KEY = "aiExerciseApp";
+
+/* ---------- LOAD & GUARD ---------- */
+const appData = JSON.parse(localStorage.getItem(APP_KEY));
+if (!appData || !appData.workout) {
+  window.location.href = "5.html";
+}
+const exercise = appData.workout;
+
+/* ---------- STATE ---------- */
+let sets = 4;
+let timePerSet = 45;
+
+/* ---------- TITLE ---------- */
+const titleEl = document.querySelector("header h1");
+if (titleEl) titleEl.innerText = exercise.label;
+
+/* ---------- DEMO IMAGE ---------- */
+const demoImg = document.querySelector(".aspect-video img");
+if (demoImg && exercise.image) demoImg.src = exercise.image;
+
+/* ---------- DISABLE OVERLAY CLICK ---------- */
+document
+  .querySelectorAll(".aspect-video > div")
+  .forEach(el => el.style.pointerEvents = "none");
+
+/* ---------- PLAY VIDEO ---------- */
+const playBtn = document.querySelector(".aspect-video button");
+if (playBtn && demoImg) {
+  playBtn.style.pointerEvents = "auto";
+  playBtn.onclick = () => {
+    const video = document.createElement("video");
+    video.src = exercise.video;
+    video.controls = true;
+    video.autoplay = true;
+    video.playsInline = true;
+    video.className = demoImg.className;
+
+    demoImg.replaceWith(video);
+    playBtn.style.display = "none";
+  };
+}
+
+/* ---------- SET COUNT ---------- */
+const setCountEl = document.querySelector(".text-4xl.font-black.text-brand-orange");
+if (setCountEl) setCountEl.innerText = sets;
+
+/* ---------- SET DOTS ---------- */
+const dots = document.querySelectorAll(".flex.gap-2\\.5 > div");
+function syncDots() {
+  dots.forEach((d, i) => {
+    d.className =
+      i < sets
+        ? "w-4 h-4 rounded-full bg-brand-orange shadow-sm"
+        : "w-4 h-4 rounded-full bg-gray-300";
+  });
+}
+syncDots();
+
+/* ---------- PLUS / MINUS ---------- */
+document.querySelectorAll("button").forEach(btn => {
+  const icon = btn.querySelector(".material-symbols-outlined");
+  if (!icon) return;
+
+  if (icon.innerText === "add") {
+    btn.onclick = () => {
+      if (sets < dots.length) {
+        sets++;
+        setCountEl.innerText = sets;
+        syncDots();
+      }
+    };
+  }
+
+  if (icon.innerText === "remove") {
+    btn.onclick = () => {
+      if (sets > 1) {
+        sets--;
+        setCountEl.innerText = sets;
+        syncDots();
+      }
+    };
+  }
+});
+
+/* ---------- TIME PER SET ---------- */
+document.querySelectorAll("button").forEach(btn => {
+  const span = btn.querySelector("span.text-2xl");
+  if (!span) return;
+
+  const t = Number(span.innerText);
+  if (![30,45,60,90,120,180].includes(t)) return;
+
+  btn.onclick = () => {
+    timePerSet = t;
+
+    document.querySelectorAll("button").forEach(b => {
+      const s = b.querySelector("span.text-2xl");
+      if (s && [30,45,60,90,120,180].includes(Number(s.innerText))) {
+        b.classList.remove("bg-brand-blue", "text-white");
+      }
+    });
+
+    btn.classList.add("bg-brand-blue", "text-white");
+  };
+});
+
+/* ---------- BACK BUTTON ---------- */
+/* ---------- BACK BUTTON ---------- */
+const backBtn = [...document.querySelectorAll("button")]
+  .find(b => b.querySelector(".material-symbols-outlined")?.innerText === "chevron_left");
+
+if (backBtn) {
+  backBtn.onclick = () => {
+    window.location.href = "5.html";
+  };
+}
+
+
+/* ---------- IMPORTANT: UNBLOCK NAV ---------- */
+const bottomNav = document.querySelector(".ios-tab-bar");
+if (bottomNav) bottomNav.style.pointerEvents = "none";
+
+/* ---------- START WORKOUT (FINAL) ---------- */
+const startBtn = [...document.querySelectorAll("button")]
+  .find(b => b.textContent.includes("Start Workout"));
+
+if (startBtn) {
+  startBtn.type = "button"; // กัน edge case
+  startBtn.onclick = () => {
+    appData.session = {
+      exerciseId: exercise.id,
+      label: exercise.label,
+      sets,
+      timePerSet,
+      startTime: Date.now()
+    };
+    localStorage.setItem(APP_KEY, JSON.stringify(appData));
+    window.location.href = "3.html";
+  };
+}
+</script>
+
+
+</body></html>

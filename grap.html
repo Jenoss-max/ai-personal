@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Workout Analytics</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        "wireframe-bg": "#F8FAFC",
+        "wireframe-stroke": "#E2E8F0",
+        "wireframe-text": "#0F172A",
+        "wireframe-subtext": "#64748B",
+        "brand-blue": "#007BFF",
+      },
+      fontFamily: { sans: ["Inter", "sans-serif"] }
+    }
+  }
+}
+</script>
+
+<style>
+body {
+  background-color: #f1f5f9;
+  min-height: max(884px, 100dvh);
+}
+</style>
+</head>
+
+<body class="bg-wireframe-bg text-wireframe-text font-sans antialiased
+             min-h-screen flex justify-center">
+<div class="w-full max-w-[430px] min-h-screen
+            bg-white shadow-xl border-x border-wireframe-stroke
+            flex flex-col">
+
+<header class="flex items-center justify-between px-6 py-4 bg-white border-b border-wireframe-stroke sticky top-0 z-20">
+  <h1 class="text-sm font-extrabold uppercase tracking-widest text-brand-blue">
+    Analytics
+  </h1>
+  <span class="material-symbols-outlined">analytics</span>
+</header>
+
+<main class="flex-1 px-6 pt-6 pb-24
+             flex flex-col gap-6">
+
+
+<div class="grid grid-cols-3 gap-3 mb-4">
+  <div class="bg-white rounded-2xl p-4 border text-center">
+    <p class="text-xs text-wireframe-subtext uppercase">Sessions</p>
+    <p id="totalSessions" class="text-2xl font-black">0</p>
+  </div>
+  <div class="bg-white rounded-2xl p-4 border text-center">
+    <p class="text-xs text-wireframe-subtext uppercase">Total Min</p>
+    <p id="totalMinutes" class="text-2xl font-black">0</p>
+  </div>
+  <div class="bg-white rounded-2xl p-4 border text-center">
+    <p class="text-xs text-wireframe-subtext uppercase">Total Reps</p>
+    <p id="totalReps" class="text-2xl font-black">0</p>
+  </div>
+</div>
+
+<div id="toggleContainer" class="mb-6 flex w-full rounded-xl bg-slate-100 p-1">
+  <button id="btnDaily" class="flex flex-1 items-center justify-center rounded-lg bg-white py-2 text-xs font-bold text-brand-blue shadow-sm transition-all" onclick="setMode('daily', this)">Daily</button>
+  <button id="btnWeekly" class="flex flex-1 items-center justify-center rounded-lg bg-transparent py-2 text-xs font-medium text-slate-500 hover:text-slate-700 transition-all" onclick="setMode('weekly', this)">Weekly</button>
+  <button id="btnMonthly" class="flex flex-1 items-center justify-center rounded-lg bg-transparent py-2 text-xs font-medium text-slate-500 hover:text-slate-700 transition-all" onclick="setMode('monthly', this)">Monthly</button>
+</div>
+
+<div class="bg-white border rounded-2xl p-4">
+  <h2 id="chartTitle" class="text-sm font-bold mb-2">
+    Workout Time (Minutes / Day)
+  </h2>
+  <canvas id="workoutChart" height="180"></canvas>
+</div>
+
+</main>
+
+<footer class="fixed bottom-0 left-0 right-0 max-w-[430px] mx-auto bg-white border-t px-6 py-4">
+  <button onclick="location.href='5.html'"
+    class="w-full h-12 bg-brand-blue text-white font-bold rounded-xl">
+    Back to Home
+  </button>
+</footer>
+
+<script>
+/* ---------- LOAD REAL DATA ---------- */
+const history = JSON.parse(localStorage.getItem("workoutHistory")) || [];
+
+/* ---------- SUMMARY ---------- */
+document.getElementById("totalSessions").innerText = history.length;
+document.getElementById("totalMinutes").innerText =
+  Math.floor(history.reduce((s, x) => s + (x.elapsedSec || 0), 0) / 60);
+document.getElementById("totalReps").innerText =
+  history.reduce((s, x) => s + (x.reps || 0), 0);
+
+/* ---------- UTIL ---------- */
+function getWeekKey(date) {
+  const d = new Date(date);
+  d.setHours(0,0,0,0);
+  d.setDate(d.getDate() + 4 - (d.getDay() || 7));
+  const yearStart = new Date(d.getFullYear(),0,1);
+  const week = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+  return `${d.getFullYear()}-W${week}`;
+}
+
+function groupData(mode) {
+  const map = {};
+  history.forEach(s => {
+    let key;
+    const d = new Date(s.timestamp);
+    if (mode === "daily") {
+      key = d.toLocaleDateString();
+    } else if (mode === "weekly") {
+      key = getWeekKey(d);
+    } else {
+      key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
+    }
+    map[key] = (map[key] || 0) + Math.round((s.elapsedSec || 0) / 60);
+  });
+  return map;
+}
+
+/* ---------- CHART ---------- */
+let chart;
+function renderChart(mode) {
+  const map = groupData(mode);
+  const labels = Object.keys(map);
+  const data = Object.values(map);
+
+  document.getElementById("chartTitle").innerText =
+    mode === "daily"
+      ? "Workout Time (Minutes / Day)"
+      : mode === "weekly"
+      ? "Workout Time (Minutes / Week)"
+      : "Workout Time (Minutes / Month)";
+
+  if (chart) chart.destroy();
+
+  chart = new Chart(document.getElementById("workoutChart"), {
+    type: "line",
+    data: {
+      labels,
+      datasets: [{
+        data,
+        borderColor: "#007BFF",
+        backgroundColor: "rgba(0,123,255,0.15)",
+        fill: true,
+        tension: 0.4,
+        pointRadius: 4
+      }]
+    },
+    options: {
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true } }
+    }
+  });
+}
+
+/* ---------- TOGGLE LOGIC (FIXED) ---------- */
+function setMode(mode, clickedBtn) {
+  // 1. Reset all buttons to "Inactive" style
+  const buttons = document.querySelectorAll("#toggleContainer button");
+
+  // Class สำหรับปุ่มที่ *ไม่ได้เลือก*
+  const inactiveClasses = ["bg-transparent", "text-slate-500", "font-medium"];
+  // Class สำหรับปุ่มที่ *เลือกอยู่*
+  const activeClasses = ["bg-white", "text-brand-blue", "font-bold", "shadow-sm"];
+
+  buttons.forEach(btn => {
+    // ลบ Active class ออกให้หมด
+    btn.classList.remove(...activeClasses);
+    // ใส่ Inactive class เข้าไป
+    btn.classList.add(...inactiveClasses);
+  });
+
+  // 2. Set "Active" style to the clicked button
+  clickedBtn.classList.remove(...inactiveClasses);
+  clickedBtn.classList.add(...activeClasses);
+
+  // 3. Render Chart
+  renderChart(mode);
+}
+
+/* ---------- INIT ---------- */
+// เริ่มต้นเรียก renderChart แบบ daily แต่ไม่ต้องเซ็ตปุ่ม เพราะ HTML เซ็ตค่าเริ่มต้นไว้แล้ว
+renderChart("daily");
+</script>
+
+</div>
+</body>
+</html>

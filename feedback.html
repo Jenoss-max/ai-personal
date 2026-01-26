@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Post Workout Survey</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    "primary": "#f48c25",
+                    "background-light": "#f8f7f5",
+                    "background-dark": "#221910",
+                },
+                fontFamily: {
+                    "display": ["Lexend"]
+                },
+                borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+            },
+        },
+    }
+</script>
+<style>
+    body { font-family: 'Lexend', sans-serif; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    .filled-icon { font-variation-settings: 'FILL' 1; }
+</style>
+<style> body { min-height: max(884px, 100dvh); } </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen flex flex-col text-[#181411] dark:text-white">
+
+<div class="flex items-center bg-background-light dark:bg-background-dark p-4 pb-2 justify-between sticky top-0 z-10">
+    <div class="text-[#181411] dark:text-white flex size-12 shrink-0 items-center justify-start cursor-pointer">
+        <span class="material-symbols-outlined" onclick="history.back()">arrow_back_ios</span>
+    </div>
+    <h2 class="text-[#181411] dark:text-white text-lg font-bold leading-tight flex-1 text-center pr-12">Check-in</h2>
+</div>
+
+<div class="flex-1 overflow-y-auto pb-24">
+
+    <div class="px-4 mt-6">
+        <h2 class="text-[#181411] dark:text-white tracking-tight text-[28px] font-bold leading-tight text-center pb-3 pt-5">
+            How tired are you?
+        </h2>
+        <p class="text-[#8a7560] dark:text-[#a6927d] text-center text-sm px-8">
+            Rate your exertion level (RPE) for this session.
+        </p>
+    </div>
+
+    <div class="flex flex-wrap gap-2 px-6 py-8 justify-between">
+
+        <div class="flex flex-col items-center gap-2">
+            <div class="flex items-center justify-center p-3 rounded-full bg-white dark:bg-[#2e2318] border border-[#e6e0db] dark:border-[#4a3e32] hover:border-primary transition-colors cursor-pointer group">
+                <span class="material-symbols-outlined text-[#8a7560] group-hover:text-primary text-3xl">bolt</span>
+            </div>
+            <span class="text-[10px] uppercase font-bold text-[#8a7560]">Easy</span>
+        </div>
+
+        <div class="flex flex-col items-center gap-2">
+            <div class="flex items-center justify-center p-3 rounded-full bg-white dark:bg-[#2e2318] border border-[#e6e0db] dark:border-[#4a3e32] hover:border-primary transition-colors cursor-pointer group">
+                <span class="material-symbols-outlined text-[#8a7560] group-hover:text-primary text-3xl">sentiment_satisfied</span>
+            </div>
+            <span class="text-[10px] uppercase font-bold text-[#8a7560]">Light</span>
+        </div>
+
+        <div class="flex flex-col items-center gap-2">
+            <div class="flex items-center justify-center p-3 rounded-full bg-white dark:bg-[#2e2318] border border-[#e6e0db] dark:border-[#4a3e32] hover:border-primary transition-colors cursor-pointer group">
+                <span class="material-symbols-outlined text-[#8a7560] group-hover:text-primary text-3xl">water_drop</span>
+            </div>
+            <span class="text-[10px] uppercase font-bold text-[#8a7560]">Moderate</span>
+        </div>
+
+        <div class="flex flex-col items-center gap-2">
+            <div class="flex items-center justify-center p-3 rounded-full bg-white dark:bg-[#2e2318] border border-[#e6e0db] dark:border-[#4a3e32] hover:border-primary transition-colors cursor-pointer group">
+                <span class="material-symbols-outlined text-[#8a7560] group-hover:text-primary text-3xl">fitness_center</span>
+            </div>
+            <span class="text-[10px] uppercase font-bold text-[#8a7560]">Hard</span>
+        </div>
+
+        <div class="flex flex-col items-center gap-2">
+            <div class="flex items-center justify-center p-3 rounded-full bg-primary/20 border-2 border-primary cursor-pointer group">
+                <span class="material-symbols-outlined text-primary text-3xl filled-icon">battery_0_bar</span>
+            </div>
+            <span class="text-[10px] uppercase font-bold text-primary">Max</span>
+        </div>
+    </div>
+
+    <div class="flex flex-col gap-4 px-4 py-3">
+        <label class="flex flex-col min-w-40 flex-1">
+            <p class="text-[#181411] dark:text-white text-base font-medium leading-normal pb-2">Notes (Optional)</p>
+            <textarea class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#181411] dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary border border-[#e6e0db] dark:border-[#4a3e32] bg-white dark:bg-[#2e2318] min-h-36 placeholder:text-[#8a7560] p-4 text-base font-normal leading-normal" placeholder="Any pain or specific feelings?"></textarea>
+        </label>
+    </div>
+
+    <div class="px-4 py-6">
+        <button class="w-full bg-primary text-white font-bold py-4 rounded-xl shadow-lg shadow-primary/20 active:scale-95 transition-transform">
+            COMPLETE WORKOUT
+        </button>
+    </div>
+</div>
+
+<script>
+let tirednessLevel = 5; // Default (Max) - ตาม UI ที่เลือกไว้
+
+const buttons = document.querySelectorAll(".flex.flex-col.items-center.gap-2");
+
+buttons.forEach((btn, index) => {
+    btn.onclick = () => {
+        tirednessLevel = index + 1; // 1-5
+
+        // Reset all styles
+        buttons.forEach(b => {
+            const circle = b.querySelector("div");
+            const icon = b.querySelector("span");
+            const label = b.querySelector("span:last-child");
+
+            circle.className = "flex items-center justify-center p-3 rounded-full bg-white dark:bg-[#2e2318] border border-[#e6e0db] dark:border-[#4a3e32] hover:border-primary transition-colors cursor-pointer group";
+            icon.className = "material-symbols-outlined text-[#8a7560] group-hover:text-primary text-3xl";
+            icon.style.fontVariationSettings = "'FILL' 0";
+            label.className = "text-[10px] uppercase font-bold text-[#8a7560]";
+        });
+
+        // Set Active Style
+        const activeCircle = btn.querySelector("div");
+        const activeIcon = btn.querySelector("span");
+        const activeLabel = btn.querySelector("span:last-child");
+
+        activeCircle.className = "flex items-center justify-center p-3 rounded-full bg-primary/20 border-2 border-primary cursor-pointer group";
+        activeIcon.className = "material-symbols-outlined text-primary text-3xl";
+        activeIcon.style.fontVariationSettings = "'FILL' 1";
+        activeLabel.className = "text-[10px] uppercase font-bold text-primary";
+    };
+});
+
+document.querySelector("button.w-full.bg-primary").onclick = () => {
+    const note = document.querySelector("textarea").value;
+    // ดึงผลลัพธ์ล่าสุดมาเพื่อแนบข้อมูลความเหนื่อยเข้าไป
+    const lastResult = JSON.parse(localStorage.getItem("lastResult")) || {};
+
+    // สร้าง Object บันทึกความเหนื่อย
+    const feedbackData = {
+        sessionId: lastResult.sessionNo,
+        exercise: lastResult.exerciseName,
+        tiredness: tirednessLevel, // 1-5
+        note: note,
+        timestamp: Date.now()
+    };
+
+    // บันทึกลง LocalStorage (แยกเก็บ หรือรวมก็ได้)
+    const history = JSON.parse(localStorage.getItem("feedbackHistory")) || [];
+    history.push(feedbackData);
+    localStorage.setItem("feedbackHistory", JSON.stringify(history));
+
+    // *** กลับหน้า Home ***
+    location.href = "5.html";
+};
+</script>
+
+</body>
+</html>
