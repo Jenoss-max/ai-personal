@@ -65,8 +65,9 @@ tailwind.config = {
 const APP_KEY = "aiExerciseApp";
 const appData = JSON.parse(localStorage.getItem(APP_KEY));
 
+// ถ้าไม่มีข้อมูล ให้ดีดไปหน้าแรกทันที
 if (!appData || !appData.user) {
-  window.location.href = "6.html"; // ถ้าไม่มี User ดีดไปหน้าแรก
+  window.location.href = "6.html";
 }
 
 const user = appData.user;
@@ -77,6 +78,7 @@ document.getElementById("goal").innerText = user.goalWeight ?? 0;
 
 document.getElementById("editProfileBtn").onclick = () => location.href = "2.html?edit=1";
 
+/* ---------- DARK MODE ---------- */
 const darkToggle = document.getElementById("darkToggle");
 if (user.darkMode) {
   document.documentElement.classList.add("dark");
@@ -89,11 +91,9 @@ darkToggle.onchange = () => {
   document.documentElement.classList.toggle("dark", user.darkMode);
 };
 
+/* ---------- SIGN OUT (แก้ไข: ไม่ลบข้อมูล แค่กลับหน้าแรก) ---------- */
 document.getElementById("signOutBtn").onclick = () => {
-  // ลบข้อมูล (หรือจะเก็บไว้ก็ได้แล้วแต่ Logic แอป)
-  // localStorage.removeItem(APP_KEY);
-
-  // กลับไปหน้าแรก
+  // ไม่ใช้ localStorage.removeItem() ข้อมูลจะยังอยู่
   window.location.href = "6.html";
 };
 </script>

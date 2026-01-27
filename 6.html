@@ -13,11 +13,7 @@
         darkMode: "class",
         theme: {
             extend: {
-                colors: {
-                    "primary": "#f48c25",
-                    "background-light": "#ffffff",
-                    "background-dark": "#111827", // slate-900 equivalent
-                },
+                colors: { "primary": "#f48c25", "background-light": "#ffffff", "background-dark": "#111827" },
                 fontFamily: { "display": ["Lexend", "sans-serif"] },
                 borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
             },
@@ -48,38 +44,29 @@
                 <span class="material-symbols-outlined !text-[32px]">fitness_center</span>
             </div>
         </div>
-        <h1 class="text-[#181411] dark:text-white text-2xl font-bold leading-tight tracking-[-0.015em] font-display">
-            AI EXERCISE
-        </h1>
+        <h1 class="text-[#181411] dark:text-white text-2xl font-bold leading-tight tracking-[-0.015em] font-display">AI EXERCISE</h1>
     </header>
 
     <main class="flex-1 flex flex-col items-center px-4">
         <div class="w-full mt-4 mb-6">
             <div class="relative w-full aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl">
-                <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1000&auto=format&fit=crop"
-                     class="w-full h-full object-cover" alt="Workout">
+                <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover" alt="Workout">
                 <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-
                 <div class="absolute bottom-6 left-6 right-6 text-white">
                     <p class="font-bold text-lg">AI-Powered Tracking</p>
                     <p class="text-xs opacity-80">Real-time form correction with camera</p>
                 </div>
             </div>
         </div>
-
         <div class="w-full text-center space-y-2 mb-8">
-            <h2 class="text-[#181411] dark:text-white text-[28px] font-bold leading-tight tracking-[-0.015em] px-4 font-display">
-                Elevate Your Fitness
-            </h2>
-            <p class="text-[#181411]/70 dark:text-slate-400 text-base font-normal leading-normal px-8 font-display">
-                Your AI-Powered Fitness Journey Starts Here. Personalized workouts tailored to your goals.
-            </p>
+            <h2 class="text-[#181411] dark:text-white text-[28px] font-bold leading-tight tracking-[-0.015em] px-4 font-display">Elevate Your Fitness</h2>
+            <p class="text-[#181411]/70 dark:text-slate-400 text-base font-normal leading-normal px-8 font-display">Your AI-Powered Fitness Journey Starts Here.</p>
         </div>
     </main>
 
     <footer class="pb-12 px-6">
         <div class="flex flex-col gap-4 w-full">
-            <button onclick="location.href='2.html'" class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-2xl h-14 px-5 bg-primary text-white text-lg font-bold leading-normal tracking-[0.015em] w-full shadow-lg shadow-primary/30 active:scale-[0.98] transition-transform">
+            <button onclick="location.href='2.html?new=1'" class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-2xl h-14 px-5 bg-primary text-white text-lg font-bold leading-normal tracking-[0.015em] w-full shadow-lg shadow-primary/30 active:scale-[0.98] transition-transform">
                 <span class="truncate">CREATE PROFILE</span>
             </button>
 
@@ -87,25 +74,21 @@
                 <span class="truncate">LOGIN</span>
             </button>
         </div>
-
-        <p class="mt-6 text-center text-xs text-[#181411]/40 dark:text-slate-500 px-4">
-            By continuing, you agree to our <a class="underline hover:text-primary" href="#">Terms</a> and <a class="underline hover:text-primary" href="#">Privacy Policy</a>.
-        </p>
+        <p class="mt-6 text-center text-xs text-[#181411]/40 dark:text-slate-500 px-4">By continuing, you agree to our <a class="underline hover:text-primary" href="#">Terms</a> and <a class="underline hover:text-primary" href="#">Privacy Policy</a>.</p>
     </footer>
-
     <div class="h-8 w-full"></div>
 </div>
 
 <script>
     function checkLogin() {
-        // เช็คว่ามีข้อมูล User หรือยัง
         const data = JSON.parse(localStorage.getItem("aiExerciseApp"));
+        // เช็คว่ามีข้อมูล User อยู่ในเครื่องไหม
         if (data && data.user && data.user.name) {
-            location.href = '5.html'; // มีแล้วไปหน้าเลือกท่า
+            location.href = '5.html'; // มี -> ไปหน้าเลือกท่าเลย
         } else {
-            // ยังไม่มี -> ไปหน้าสร้างโปรไฟล์ (หรือจะ Alert ก็ได้)
-            if(confirm("No profile found on this device. Create one?")) {
-                location.href = '2.html';
+            // ไม่มี -> ถาม user ว่าจะสร้างใหม่ไหม
+            if(confirm("No profile found. Create a new one?")) {
+                location.href = '2.html?new=1';
             }
         }
     }

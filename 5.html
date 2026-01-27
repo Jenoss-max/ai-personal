@@ -121,22 +121,62 @@
 </div>
 <script>
 const APP_KEY = "aiExerciseApp";
-const MOCK_EXERCISES = {
-    "squat": { label: "Squat", rep: "12 Reps", file: "squat.json", video: "squat.mp4", image: "squat.png" },
-    "pushup": { label: "Push Up", rep: "10 Reps", file: "pushup.json", video: "pushup.mp4", image: "pushup.png" },
-    "plank": { label: "Plank", rep: "30 Sec", file: "plank.json", video: "plank.mp4", image: "plank.png" },
-    "lunge": { label: "Lunge", rep: "10 Reps", file: "lunge.json", video: "lunge.mp4", image: "lunge.png" },
-    "bird_dog": { label: "Bird Dog", rep: "10 Reps", file: "bird_dog.json", video: "bird_dog.mp4", image: "bird_dog.png" }
+
+// 1. นำข้อมูลจาก exercises.json มาใส่ตรงนี้
+const EXERCISE_DATA = {
+  "squat": {
+    "label": "Squat",
+    "file": "squat.json",
+    "video": "squat.mp4",
+    "image": "squat.jpg",
+    "rep": "squat"
+  },
+  "reverse_lunge": {
+    "label": "Reverse Lunge",
+    "file": "reverse_lunge.json",
+    "video": "reverse_lunge.mp4",
+    "image": "reverse_lunge.jpg",
+    "rep": "squat"
+  },
+  "pushup": {
+    "label": "Push Up",
+    "file": "pushup.json",
+    "video": "pushup.mp4",
+    "image": "pushup.jpg",
+    "rep": "pushup"
+  },
+  "knee_pushup": {
+    "label": "Knee Push Up",
+    "file": "knee_pushup.json",
+    "video": "knee_pushup.mp4",
+    "image": "knee_pushup.jpg",
+    "rep": "pushup"
+  },
+  "plank": {
+    "label": "Plank",
+    "file": "plank.json",
+    "video": "plank.mp4",
+    "image": "plank.jpg",
+    "rep": "hold"
+  },
+  "bird_dog": {
+    "label": "Bird Dog",
+    "file": "bird_dog.json",
+    "video": "bird_dog.mp4",
+    "image": "bird_dog.jpg",
+    "rep": "squat"
+  }
 };
 
 const appData = JSON.parse(localStorage.getItem(APP_KEY));
 if (!appData || !appData.user) {
-  window.location.href = "6.html"; // Guard: ดีดกลับไปหน้า 6.html
+  window.location.href = "6.html";
 }
 
 const welcomeEl = document.getElementById("welcomeName");
 if (welcomeEl && appData.user?.name) { welcomeEl.innerText = `Hi!  ${appData.user.name}👋`; }
 
+// Stats Calculation
 const DAILY_TARGET_MIN = 60; const DAILY_TARGET_KCAL = 400;
 const history = JSON.parse(localStorage.getItem("workoutHistory")) || [];
 const todayKey = new Date().toDateString();
@@ -157,10 +197,17 @@ document.getElementById("timeBar").style.width = timePercent + "%";
 document.getElementById("kcalBar").style.width = kcalPercent + "%";
 document.getElementById("goalPercent").innerText = `${overallPercent}% Complete`;
 
+// Render Grid
 function renderWorkoutGrid() {
   const grid = document.getElementById("workoutGrid");
   grid.innerHTML = "";
-  Object.entries(MOCK_EXERCISES).forEach(([id, ex]) => {
+  Object.entries(EXERCISE_DATA).forEach(([id, ex]) => {
+
+    // แปลง rep type เป็นข้อความที่เข้าใจง่าย
+    let repText = "12 Reps";
+    if (ex.rep === "hold") repText = "30 Sec";
+    else if (ex.rep === "pushup") repText = "10 Reps";
+
     const card = document.createElement("div");
     card.className = `bg-white dark:bg-slate-800 p-4 rounded-3xl border border-gray-100 dark:border-slate-700 shadow-card flex flex-col gap-3 cursor-pointer hover:scale-[1.03] transition`;
     card.innerHTML = `
@@ -169,7 +216,7 @@ function renderWorkoutGrid() {
       </div>
       <div>
         <p class="font-bold text-brand-blue dark:text-blue-400">${ex.label}</p>
-        <p class="text-[10px] text-slate-400 font-bold uppercase">${ex.rep}</p>
+        <p class="text-[10px] text-slate-400 font-bold uppercase">${repText}</p>
       </div>
     `;
     card.addEventListener("click", () => selectExercise(id, ex));
@@ -179,7 +226,15 @@ function renderWorkoutGrid() {
 
 function selectExercise(id, ex) {
   const appData = JSON.parse(localStorage.getItem(APP_KEY));
-  appData.workout = { id: id, label: ex.label, ruleFile: `./${ex.file}`, video: `./assets/videos/${ex.video}`, image: `./assets/images/${ex.image}`, repType: ex.rep };
+  // Save Selected Exercise to LocalStorage
+  appData.workout = {
+      id: id,
+      label: ex.label,
+      ruleFile: `./${ex.file}`,
+      video: `./assets/videos/${ex.video}`, // Construct path
+      image: `./assets/images/${ex.image}`,
+      repType: ex.rep
+  };
   localStorage.setItem(APP_KEY, JSON.stringify(appData));
   window.location.href = "4.html";
 }

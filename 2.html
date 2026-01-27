@@ -135,8 +135,21 @@
     const APP_KEY = "aiExerciseApp";
     const urlParams = new URLSearchParams(window.location.search);
     const isEditing = urlParams.has('edit');
+    const isNew = urlParams.has('new');
+
+    // ถ้ากด Create Profile มา (isNew) -> ล้างข้อมูลเก่าทิ้งเลย
+    if (isNew) {
+        localStorage.removeItem(APP_KEY);
+        // localStorage.removeItem("workoutHistory"); // ถ้าต้องการล้างประวัติด้วยให้ uncomment บรรทัดนี้
+        // localStorage.removeItem("lastResult");
+    }
+
     const checkData = JSON.parse(localStorage.getItem(APP_KEY));
-    if (checkData && checkData.user && !isEditing) window.location.href = "5.html";
+
+    // Auto-Redirect: ถ้ามีข้อมูลอยู่แล้ว และไม่ได้กด Edit และไม่ได้กด Create New -> ไปหน้า 5
+    if (checkData && checkData.user && !isEditing && !isNew) {
+        window.location.href = "5.html";
+    }
 
     let selectedGender = "";
     document.querySelectorAll("[data-gender]").forEach(btn => {
