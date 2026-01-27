@@ -5,81 +5,78 @@
 <title>Workouts Hub</title>
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
 <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        "display": ["Lexend", "sans-serif"]
-                    },
-                    colors: {
-                        brand: {
-                            blue: '#0B2447',
-                            accent: '#19376D',
-                            orange: '#F97316',
-                            light: '#E6F0FF',
-                        }
-                    },
-                    boxShadow: {
-                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
-                        'card': '0 10px 30px -10px rgba(0, 0, 0, 0.1)',
+    tailwind.config = {
+        darkMode: 'class',
+        theme: {
+            extend: {
+                fontFamily: { "display": ["Lexend", "sans-serif"] },
+                colors: {
+                    brand: {
+                        blue: '#0B2447',
+                        accent: '#19376D',
+                        orange: '#F97316',
+                        light: '#E6F0FF',
                     }
+                },
+                boxShadow: {
+                    'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                    'card': '0 10px 30px -10px rgba(0, 0, 0, 0.1)',
                 }
             }
         }
-    </script>
-<style type="text/tailwindcss">
-        :root {
-            --ios-safe-bottom: 34px;
-        }
-        body {
-            background-color: #F8FAFC;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .phone-container {
-            width: 100%;
-            max-width: 430px;
-            margin: 0 auto;
-            min-height: 100dvh;
-            position: relative;
-            background: #F8FAFC;
-            display: flex;
-            flex-direction: column;
-        }
-        .nav-active {
-            color: #0B2447;
-        }
-        .nav-active .material-symbols-outlined {
-            font-variation-settings: 'FILL' 1;
-        }
-    </style>
-<style>
-    body {
-      min-height: max(884px, 100dvh);
     }
-  </style>
-  </head>
-<body class="font-display antialiased text-slate-900">
+</script>
+
+<script>
+    (function() {
+        try {
+            const data = JSON.parse(localStorage.getItem("aiExerciseApp"));
+            if (data && data.user && data.user.darkMode) {
+                document.documentElement.classList.add("dark");
+            } else {
+                document.documentElement.classList.remove("dark");
+            }
+        } catch (e) {}
+    })();
+</script>
+
+<style type="text/tailwindcss">
+    :root { --ios-safe-bottom: 34px; }
+    /* ปรับพื้นหลังรองรับ Dark Mode */
+    body { @apply bg-slate-50 dark:bg-slate-900 transition-colors duration-300; -webkit-tap-highlight-color: transparent; }
+    .phone-container {
+        width: 100%; max-width: 430px; margin: 0 auto; min-height: 100dvh; position: relative;
+        @apply bg-slate-50 dark:bg-slate-900 flex flex-col border-x border-slate-200 dark:border-slate-700 shadow-xl;
+    }
+    .nav-active { @apply text-brand-blue dark:text-blue-400; }
+    .nav-active .material-symbols-outlined { font-variation-settings: 'FILL' 1; }
+</style>
+<style> body { min-height: max(884px, 100dvh); } </style>
+</head>
+
+<body class="font-display antialiased text-slate-900 dark:text-slate-100">
 <div class="phone-container">
-<header class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl px-6 py-5 flex items-center justify-between">
+<header class="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl px-6 py-5 flex items-center justify-between border-b border-transparent dark:border-slate-800">
 <div class="flex items-center gap-2">
 <div class="flex items-center gap-0.5">
-<span class="material-symbols-outlined text-brand-blue text-xl" style="font-variation-settings: 'FILL' 1, 'wght' 700;">fitness_center</span>
+<span class="material-symbols-outlined text-brand-blue dark:text-blue-400 text-xl" style="font-variation-settings: 'FILL' 1, 'wght' 700;">fitness_center</span>
 <div class="flex flex-col -gap-1">
-<span class="text-xs font-black italic tracking-tighter text-brand-blue leading-none">AI</span>
+<span class="text-xs font-black italic tracking-tighter text-brand-blue dark:text-blue-400 leading-none">AI</span>
 <span class="text-[8px] font-black italic tracking-tighter text-brand-orange leading-none">EXERCISE</span>
 </div>
 </div>
 </div>
 <div class="flex items-center gap-3">
-<button class="w-10 h-10 rounded-full bg-brand-light flex items-center justify-center text-brand-blue relative">
+<button class="w-10 h-10 rounded-full bg-brand-light dark:bg-slate-800 flex items-center justify-center text-brand-blue dark:text-blue-400 relative">
 <span class="material-symbols-outlined text-2xl">notifications</span>
-<span class="absolute top-2.5 right-2.5 w-2 h-2 bg-brand-orange rounded-full border-2 border-white"></span>
+<span class="absolute top-2.5 right-2.5 w-2 h-2 bg-brand-orange rounded-full border-2 border-white dark:border-slate-800"></span>
 </button>
-<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-brand-light">
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-brand-light dark:border-slate-700">
 <img alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCcWnBdMCYhgVqaX9fYt1xym6mAiIc_tCBp247UUoxKqJAo7UijX5gdf3kvJHtVM5REpA0w3Mztfd2RBefaCtxWB_CSDoq04foMR0K-wMeMBxYhDDZyDqaC7CaOMHUBxPtOSlDeTB2okOyJL26wBLeeU6H3y4q8_zCx0MPGMRx0XonD5p83v_c4twhaIv4kC0yInTOehozjKM3Ti_fPx-7G0i7Cd5qhU_TFWfM9TzgGyALwgUmz8vK4v6e7c2jroyuD0zkCBp4urxM"/>
 </div>
 </div>
@@ -87,15 +84,15 @@
 <main class="flex-1 overflow-y-auto px-6 pb-32">
 <section class="mt-4 mb-6">
 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-1">Welcome Back</p>
-<h1 id="welcomeName" class="text-2xl font-extrabold text-brand-blue leading-tight">
+<h1 id="welcomeName" class="text-2xl font-extrabold text-brand-blue dark:text-white leading-tight">
   Hi! 👋
 </h1>
 
 </section>
 <section class="mb-8">
-  <div class="bg-white p-5 rounded-[28px] border border-gray-100 shadow-soft">
+  <div class="bg-white dark:bg-slate-800 p-5 rounded-[28px] border border-gray-100 dark:border-slate-700 shadow-soft">
     <div class="flex items-center justify-between mb-4">
-      <h3 class="text-xs font-bold text-brand-blue uppercase tracking-widest">
+      <h3 class="text-xs font-bold text-brand-blue dark:text-blue-400 uppercase tracking-widest">
         Today's Goal
       </h3>
       <span id="goalPercent" class="text-xs font-bold text-brand-orange">
@@ -104,13 +101,12 @@
     </div>
 
     <div class="flex gap-4">
-      <!-- KCAL -->
       <div class="flex-1 flex flex-col gap-1">
-        <p class="text-xl font-black text-brand-blue">
+        <p class="text-xl font-black text-brand-blue dark:text-white">
           <span id="todayKcal">0</span>
           <span class="text-[10px] text-slate-400 uppercase font-bold">kcal</span>
         </p>
-        <div class="w-full bg-gray-100 h-1.5 rounded-full">
+        <div class="w-full bg-gray-100 dark:bg-slate-700 h-1.5 rounded-full">
           <div id="kcalBar"
                class="bg-brand-orange h-full rounded-full"
                style="width: 0%;">
@@ -118,15 +114,14 @@
         </div>
       </div>
 
-      <!-- TIME -->
       <div class="flex-1 flex flex-col gap-1">
-        <p class="text-xl font-black text-brand-blue">
+        <p class="text-xl font-black text-brand-blue dark:text-white">
           <span id="todayMin">0</span>
           <span class="text-[10px] text-slate-400 uppercase font-bold">min</span>
         </p>
-        <div class="w-full bg-gray-100 h-1.5 rounded-full">
+        <div class="w-full bg-gray-100 dark:bg-slate-700 h-1.5 rounded-full">
           <div id="timeBar"
-               class="bg-brand-blue h-full rounded-full"
+               class="bg-brand-blue dark:bg-blue-500 h-full rounded-full"
                style="width: 0%;">
           </div>
         </div>
@@ -138,19 +133,19 @@
 
 <section class="mb-6">
 <div class="flex items-center justify-between mb-4">
-<h3 class="text-sm font-bold text-brand-blue uppercase tracking-widest">Workout Library</h3>
+<h3 class="text-sm font-bold text-brand-blue dark:text-blue-400 uppercase tracking-widest">Workout Library</h3>
 <button class="text-xs font-bold text-brand-orange uppercase">See All</button>
 </div>
 <div id="workoutGrid" class="grid grid-cols-2 gap-4"></div>
 
 </section>
 <div class="flex justify-center items-center gap-1 opacity-20 py-8 select-none">
-<span class="material-symbols-outlined text-brand-blue text-2xl" style="font-variation-settings: 'FILL' 1, 'wght' 700;">fitness_center</span>
-<span class="text-xl font-black italic tracking-tighter text-brand-blue">AI</span>
+<span class="material-symbols-outlined text-brand-blue dark:text-white text-2xl" style="font-variation-settings: 'FILL' 1, 'wght' 700;">fitness_center</span>
+<span class="text-xl font-black italic tracking-tighter text-brand-blue dark:text-white">AI</span>
 <span class="text-xl font-black italic tracking-tighter text-brand-orange">EXERCISE</span>
 </div>
 </main>
-<nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-white/90 backdrop-blur-xl border-t border-gray-100 px-10 pt-3 pb-[calc(10px+var(--ios-safe-bottom))] z-50 flex justify-between items-center shadow-[0_-8px_20px_rgba(0,0,0,0.04)]">
+<nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-t border-gray-100 dark:border-slate-800 px-10 pt-3 pb-[calc(10px+var(--ios-safe-bottom))] z-50 flex justify-between items-center shadow-[0_-8px_20px_rgba(0,0,0,0.04)]">
 <button onclick="location.href='5.html'"
   class="flex flex-col items-center gap-1 nav-active">
   <span class="material-symbols-outlined">fitness_center</span>
@@ -158,13 +153,13 @@
 </button>
 
 <button onclick="location.href='grap.html'"
-  class="flex flex-col items-center gap-1 group text-slate-400">
+  class="flex flex-col items-center gap-1 group text-slate-400 dark:text-slate-500 hover:text-brand-blue dark:hover:text-blue-400 transition-colors">
   <span class="material-symbols-outlined">analytics</span>
   <span class="text-[10px] font-bold">Analytics</span>
 </button>
 
 <button onclick="location.href='1.html'"
-  class="flex flex-col items-center gap-1 group text-slate-400">
+  class="flex flex-col items-center gap-1 group text-slate-400 dark:text-slate-500 hover:text-brand-blue dark:hover:text-blue-400 transition-colors">
   <span class="material-symbols-outlined">person</span>
   <span class="text-[10px] font-bold">Profile</span>
 </button>
@@ -176,7 +171,14 @@
    CONFIG
 ========================= */
 const APP_KEY = "aiExerciseApp";
-const EXERCISE_JSON = "./exercises.json";
+// EXERCISE DATA (Mock up inside script for standalone testing)
+const MOCK_EXERCISES = {
+    "squat": { label: "Squat", rep: "12 Reps", file: "squat.json", video: "squat.mp4", image: "squat.png" },
+    "pushup": { label: "Push Up", rep: "10 Reps", file: "pushup.json", video: "pushup.mp4", image: "pushup.png" },
+    "plank": { label: "Plank", rep: "30 Sec", file: "plank.json", video: "plank.mp4", image: "plank.png" },
+    "lunge": { label: "Lunge", rep: "10 Reps", file: "lunge.json", video: "lunge.mp4", image: "lunge.png" },
+    "bird_dog": { label: "Bird Dog", rep: "10 Reps", file: "bird_dog.json", video: "bird_dog.mp4", image: "bird_dog.png" }
+};
 
 /* =========================
    GUARD: ต้องมี user
@@ -242,35 +244,19 @@ document.getElementById("goalPercent").innerText =
   `${overallPercent}% Complete`;
 
 /* =========================
-   LOAD EXERCISES
-========================= */
-async function loadExercises() {
-  try {
-    const res = await fetch(EXERCISE_JSON);
-    if (!res.ok) throw new Error("Cannot load exercises.json");
-
-    const exercises = await res.json();
-    renderWorkoutGrid(exercises);
-
-  } catch (err) {
-    console.error(err);
-    alert("Failed to load exercise data");
-  }
-}
-
-/* =========================
    RENDER GRID
 ========================= */
-function renderWorkoutGrid(exercises) {
+function renderWorkoutGrid() {
   const grid = document.getElementById("workoutGrid");
   grid.innerHTML = "";
 
-  Object.entries(exercises).forEach(([id, ex]) => {
+  Object.entries(MOCK_EXERCISES).forEach(([id, ex]) => {
     const card = document.createElement("div");
 
+    // เพิ่ม dark:bg-slate-800 dark:border-slate-700
     card.className = `
-      bg-white p-4 rounded-3xl
-      border border-gray-100 shadow-card
+      bg-white dark:bg-slate-800 p-4 rounded-3xl
+      border border-gray-100 dark:border-slate-700 shadow-card
       flex flex-col gap-3
       cursor-pointer
       hover:scale-[1.03]
@@ -278,12 +264,12 @@ function renderWorkoutGrid(exercises) {
     `;
 
     card.innerHTML = `
-      <div class="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center text-brand-orange">
+      <div class="w-12 h-12 rounded-2xl bg-orange-50 dark:bg-slate-700 flex items-center justify-center text-brand-orange">
         <span class="material-symbols-outlined text-2xl">fitness_center</span>
       </div>
 
       <div>
-        <p class="font-bold text-brand-blue">${ex.label}</p>
+        <p class="font-bold text-brand-blue dark:text-blue-400">${ex.label}</p>
         <p class="text-[10px] text-slate-400 font-bold uppercase">
           ${ex.rep}
         </p>
@@ -319,7 +305,7 @@ function selectExercise(id, ex) {
 /* =========================
    INIT
 ========================= */
-loadExercises();
+renderWorkoutGrid();
 </script>
 
 </body></html>

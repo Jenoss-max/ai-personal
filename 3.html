@@ -3,471 +3,199 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>AI Workout Session</title>
-
+<title>AI Workout</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-
 <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
-
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
-
 <script>
-tailwind.config = {
-  theme: {
-    extend: {
-      colors: {
-        "primary-blue": "#003366",
-        "vibrant-blue": "#0066FF",
-        "vibrant-orange": "#FF6600",
-        "bg-light": "#F8FAFC",
-      },
-      fontFamily: { display: ["Lexend"] },
-      borderRadius: { "2xl": "1.5rem" }
+    tailwind.config = {
+        darkMode: 'class',
+        theme: {
+            extend: {
+                colors: { "primary-blue": "#003366", "vibrant-blue": "#0066FF", "vibrant-orange": "#FF6600", "bg-light": "#F8FAFC" },
+                fontFamily: { display: ["Lexend"] }, borderRadius: { "2xl": "1.5rem" }
+            }
+        }
     }
-  }
-}
 </script>
-
-<style>
-body { font-family: 'Lexend', sans-serif; }
-</style>
+<script>
+    (function() {
+        try {
+            const data = JSON.parse(localStorage.getItem("aiExerciseApp"));
+            if (data && data.user && data.user.darkMode) document.documentElement.classList.add("dark");
+        } catch(e) {}
+    })();
+</script>
+<style> body { font-family: 'Lexend', sans-serif; } </style>
 </head>
+<body class="bg-bg-light dark:bg-slate-900 text-primary-blue dark:text-white font-display flex justify-center min-h-screen">
+<div class="relative w-full max-w-[430px] h-screen flex flex-col overflow-hidden bg-white dark:bg-slate-900">
+    <div class="px-6 pt-6 pb-2 flex justify-between items-center bg-white dark:bg-slate-900 z-10">
+        <span onclick="history.back()" class="material-symbols-outlined cursor-pointer dark:text-white">arrow_back_ios</span>
+        <div class="text-center"><h2 class="font-extrabold dark:text-white">Tracking Active</h2><p class="text-vibrant-orange text-[10px] font-bold uppercase" id="exName">Exercise</p></div>
+        <span class="material-symbols-outlined dark:text-white">more_horiz</span>
+    </div>
+    <div class="px-6 py-2 bg-white dark:bg-slate-900 border-b dark:border-slate-800">
+        <div class="flex justify-between text-[10px] font-bold"><span class="text-gray-400">Progress</span><span id="progressText" class="dark:text-white">0%</span></div>
+        <div class="h-2 bg-gray-100 dark:bg-slate-700 rounded-full mt-1"><div id="progressBar" class="h-full bg-vibrant-blue rounded-full w-0"></div></div>
+    </div>
 
-<body class="bg-bg-light text-primary-blue font-display">
-<div class="relative flex h-screen max-w-[480px] mx-auto flex-col overflow-hidden">
+    <div class="relative flex-1 bg-black overflow-hidden m-4 rounded-2xl border-4 border-vibrant-blue">
+        <video id="camera" autoplay muted playsinline class="absolute inset-0 w-full h-full object-contain hidden"></video>
+        <canvas id="overlay" class="absolute inset-0 w-full h-full object-contain scale-x-[-1]"></canvas>
+    </div>
 
-<div class="flex items-center px-6 pt-8 pb-4 justify-between bg-white">
-  <span onclick="history.back()" class="material-symbols-outlined cursor-pointer">
-    arrow_back_ios
-  </span>
-  <div class="text-center">
-    <h2 class="font-extrabold">AI Workout Session</h2>
-    <p class="text-vibrant-orange text-[10px] font-bold uppercase">
-      Tracking Active
-    </p>
-  </div>
-  <span class="material-symbols-outlined">more_horiz</span>
+    <div class="px-4 pb-4 flex gap-3">
+        <div class="flex-1 bg-white dark:bg-slate-800 border dark:border-slate-700 rounded-2xl p-3 text-center"><p class="text-xs text-gray-400 uppercase" id="scoreLabel">Total Reps</p><p class="text-3xl font-black dark:text-white" id="repCount">0</p></div>
+        <div class="flex-1 bg-white dark:bg-slate-800 border dark:border-slate-700 rounded-2xl p-3 text-center"><p class="text-xs text-gray-400 uppercase">Set</p><p class="text-3xl font-black dark:text-white"><span id="setCount">1</span>/<span id="setTotal">1</span></p></div>
+        <div class="flex-1 bg-white dark:bg-slate-800 border dark:border-slate-700 rounded-2xl p-3 text-center"><p class="text-xs text-gray-400 uppercase">Time</p><p class="text-3xl font-black dark:text-white" id="timer">00:00</p></div>
+    </div>
+
+    <div class="px-4 pb-6 flex gap-3">
+        <button id="pauseBtn" class="flex-1 h-14 bg-primary-blue dark:bg-blue-600 text-white font-bold rounded-2xl">Pause</button>
+        <button id="endBtn" class="flex-1 h-14 bg-vibrant-orange text-white font-bold rounded-2xl">End</button>
+    </div>
 </div>
-
-<div class="px-6 py-2 bg-white border-b">
-  <div class="flex justify-between text-[10px] font-bold">
-    <span class="text-gray-400">Workout Progress</span>
-    <span id="progressText">0%</span>
-  </div>
-  <div class="h-2 bg-gray-100 rounded-full mt-1">
-    <div id="progressBar"
-      class="h-full bg-vibrant-blue rounded-full w-0"></div>
-  </div>
-</div>
-
-<div class="flex-1 flex flex-col gap-3 p-4">
-
-<div class="relative flex-[0.8] rounded-2xl overflow-hidden bg-black">
-  <video id="demoVideo"
-    autoplay loop muted playsinline
-    class="w-full h-full object-cover"></video>
-</div>
-
-<div class="relative flex-1 rounded-2xl overflow-hidden bg-black border-[3px] border-vibrant-blue">
-  <video id="camera"
-    autoplay muted playsinline
-    class="absolute inset-0 w-full h-full object-contain hidden"></video>
-
-  <canvas id="overlay" class="absolute inset-0 w-full h-full object-contain scale-x-[-1]"></canvas>
-</div>
-
-<div class="flex gap-4">
-  <div class="flex-1 bg-white rounded-2xl p-4 border">
-    <p id="scoreLabel" class="text-[10px] text-gray-400 uppercase">Total Reps</p>
-    <p class="text-3xl font-black">
-      <span id="repCount">0</span>
-    </p>
-  </div>
-  <div class="flex-1 bg-white rounded-2xl p-4 border">
-    <p class="text-[10px] text-gray-400 uppercase">Set</p>
-    <p class="text-3xl font-black">
-      <span id="setCount">1</span> / <span id="setTotal">1</span>
-    </p>
-  </div>
-</div>
-
-<div class="bg-white rounded-2xl p-4 border text-center">
-  <p class="text-[10px] text-gray-400 uppercase">Time Left</p>
-  <p id="timer" class="text-3xl font-black">00:00</p>
-</div>
-
-<div class="flex gap-4 pt-2">
-  <button id="pauseBtn"
-    class="flex-1 h-16 rounded-2xl bg-primary-blue text-white font-bold">
-    Pause
-  </button>
-
-  <button id="endBtn"
-    class="flex-1 h-16 rounded-2xl bg-vibrant-orange text-white font-bold">
-    End
-  </button>
-</div>
-
-</div>
-</div>
-
 <script type="module">
+    // ... Copy Logic Script จาก 3.html อันเก่ามาวางตรงนี้ ...
+    // หรือถ้าใช้ไฟล์เดิมอยู่แล้ว ก็แค่ก๊อปปี้ส่วน HTML ข้างบนไปแทนที่ครับ
+    // (Logic ไม่มีส่วนที่เกี่ยวกับสี Dark Mode เพราะมันวาดลง Canvas)
 
-/* =========================================================
-   1. INTERNAL ENGINE
-========================================================= */
+    /* เพื่อความชัวร์ ผมขอใส่ Script เต็มๆ ให้เลยครับ */
+    function calculateAngle(a, b, c) {
+        const radians = Math.atan2(c.y - b.y, c.x - b.x) - Math.atan2(a.y - b.y, a.x - b.x);
+        let angle = Math.abs(radians * 180.0 / Math.PI);
+        if (angle > 180.0) angle = 360 - angle;
+        return angle;
+    }
+    function drawAngleText(ctx, text, x, y) {
+        ctx.save(); ctx.scale(-1, 1); ctx.fillStyle = "white"; ctx.font = "bold 24px Arial"; ctx.strokeStyle = "black"; ctx.lineWidth = 3;
+        ctx.strokeText(text, -x * ctx.canvas.width, y * ctx.canvas.height); ctx.fillText(text, -x * ctx.canvas.width, y * ctx.canvas.height); ctx.restore();
+    }
+    function drawSkeleton(ctx, landmarks, color) {
+        ctx.lineWidth = 4; ctx.strokeStyle = color;
+        [[11,12],[11,13],[13,15],[12,14],[14,16],[11,23],[12,24],[23,24],[23,25],[25,27],[24,26],[26,28]].forEach(([i,j])=>{
+            if(landmarks[i].visibility>.5 && landmarks[j].visibility>.5){ ctx.beginPath(); ctx.moveTo(landmarks[i].x*ctx.canvas.width, landmarks[i].y*ctx.canvas.height); ctx.lineTo(landmarks[j].x*ctx.canvas.width, landmarks[j].y*ctx.canvas.height); ctx.stroke(); }
+        });
+    }
+    class PoseEngine {
+        constructor(rule, exerciseId) {
+            this.exerciseId = (exerciseId || "exercise").toLowerCase();
+            this.reps = 0; this.state = "UP"; this.accumulatedTime = 0; this.holdStartTime = null;
+            this.bdState = "DOWN"; this.baselineArmY = null; this.baselineLegY = null; this.prevLandmarks = null;
+        }
+        smooth(landmarks) {
+            if (!this.prevLandmarks) { this.prevLandmarks = landmarks; return landmarks; }
+            const smoothed = landmarks.map((curr, i) => {
+                const prev = this.prevLandmarks[i]; return { x: prev.x*0.5 + curr.x*0.5, y: prev.y*0.5 + curr.y*0.5, z: prev.z*0.5 + curr.z*0.5, visibility: curr.visibility };
+            });
+            this.prevLandmarks = smoothed; return smoothed;
+        }
+        process(rawLandmarks, canvasHeight) {
+            const landmarks = this.smooth(rawLandmarks);
+            let color = "#0066FF";
+            const p = { shoulder: landmarks[11], elbow: landmarks[13], wrist: landmarks[15], hip: landmarks[23], knee: landmarks[25], ankle: landmarks[27], l_wrist: landmarks[15], r_wrist: landmarks[16], l_ankle: landmarks[27], r_ankle: landmarks[28] };
+            const kneeAngle = calculateAngle(p.hip, p.knee, p.ankle);
+            const hipAngle = calculateAngle(p.knee, p.hip, p.shoulder);
+            const elbowAngle = calculateAngle(p.shoulder, p.elbow, p.wrist);
 
-function calculateAngle(a, b, c) {
-    const radians = Math.atan2(c.y - b.y, c.x - b.x) - Math.atan2(a.y - b.y, a.x - b.x);
-    let angle = Math.abs(radians * 180.0 / Math.PI);
-    if (angle > 180.0) angle = 360 - angle;
-    return angle;
-}
+            if (this.exerciseId.includes("plank")) {
+                if (hipAngle >= 160) { color = "#00FF00"; if (!this.holdStartTime) this.holdStartTime = Date.now(); }
+                else { if (this.holdStartTime) { this.accumulatedTime += (Date.now() - this.holdStartTime)/1000; this.holdStartTime = null; } }
+                let cur = this.accumulatedTime; if (this.holdStartTime) cur += (Date.now() - this.holdStartTime)/1000;
+                this.reps = Math.floor(cur); this.debugAngle = Math.round(hipAngle); this.debugPoint = p.hip;
+            } else if (this.exerciseId.includes("bird_dog")) {
+                const ly = p.l_wrist.y*canvasHeight, ry = p.r_wrist.y*canvasHeight, la = p.l_ankle.y*canvasHeight, ra = p.r_ankle.y*canvasHeight;
+                if (this.baselineArmY === null) { this.baselineArmY = (ly+ry)/2; this.baselineLegY = (la+ra)/2; }
+                const armR = (this.baselineArmY - ry) > 10, armL = (this.baselineArmY - ly) > 10, legR = (this.baselineLegY - ra) > 10, legL = (this.baselineLegY - la) > 10;
+                if ((armR && legL) || (armL && legR)) { color = "#00FF00"; if (this.bdState === "DOWN") this.bdState = "UP"; }
+                else { if (this.bdState === "UP") { this.reps++; this.bdState = "DOWN"; this.baselineArmY = (ly+ry)/2; this.baselineLegY = (la+ra)/2; } }
+            } else {
+                let angle = kneeAngle, point = p.knee, down = 135;
+                if (this.exerciseId.includes("pushup")) { angle = elbowAngle; point = p.elbow; down = 100; }
+                if (angle <= down + 10) color = "#00FF00";
+                if (angle <= down && this.state === "UP") this.state = "DOWN";
+                if (angle >= 160 && this.state === "DOWN") { this.reps++; this.state = "UP"; }
+                this.debugAngle = Math.round(angle); this.debugPoint = point;
+            }
+            return { landmarks, color, rep: this.reps, debug: {val: this.debugAngle, pt: this.debugPoint} };
+        }
+    }
 
-function drawAngleText(ctx, text, x, y) {
-    ctx.save();
-    ctx.scale(-1, 1);
-    ctx.fillStyle = "white";
-    ctx.font = "bold 24px Arial";
-    ctx.strokeStyle = "black";
-    ctx.lineWidth = 3;
-    ctx.strokeText(text, -x * ctx.canvas.width, y * ctx.canvas.height);
-    ctx.fillText(text, -x * ctx.canvas.width, y * ctx.canvas.height);
-    ctx.restore();
-}
+    const APP_KEY = "aiExerciseApp";
+    const appData = JSON.parse(localStorage.getItem(APP_KEY)) || { workout: {id:"squat"}, session:{timePerSet:60, sets:1} };
+    const exercise = appData.workout;
+    let targetReps = 12;
+    if (exercise.id.includes("plank")) { targetReps = appData.session.timePerSet; document.getElementById("scoreLabel").innerText = "Hold Time (s)"; }
+    else { document.getElementById("scoreLabel").innerText = "Total Reps"; }
 
-function drawSkeleton(ctx, landmarks, color) {
-    const CONNECTIONS = [
-        [11, 12], [11, 13], [13, 15],
-        [12, 14], [14, 16],
-        [11, 23], [12, 24],
-        [23, 24],
-        [23, 25], [25, 27],
-        [24, 26], [26, 28]
-    ];
+    let reps = 0, paused = false, timeLeft = appData.session.timePerSet, currentSet = 1, totalSets = appData.session.sets;
+    document.getElementById("setTotal").innerText = totalSets;
 
-    ctx.lineWidth = 4;
-    ctx.strokeStyle = color;
+    setInterval(() => {
+        if (paused) return;
+        timeLeft--;
+        const m = String(Math.floor(timeLeft/60)).padStart(2,"0"), s = String(timeLeft%60).padStart(2,"0");
+        document.getElementById("timer").innerText = `${m}:${s}`;
+        if (timeLeft <= 0) {
+            if (currentSet >= totalSets) finishWorkout();
+            else { currentSet++; document.getElementById("setCount").innerText = currentSet; timeLeft = appData.session.timePerSet; }
+        }
+    }, 1000);
 
-    CONNECTIONS.forEach(([i, j]) => {
-        const p1 = landmarks[i];
-        const p2 = landmarks[j];
-        if (p1 && p2 && p1.visibility > 0.5 && p2.visibility > 0.5) {
-            ctx.beginPath();
-            ctx.moveTo(p1.x * ctx.canvas.width, p1.y * ctx.canvas.height);
-            ctx.lineTo(p2.x * ctx.canvas.width, p2.y * ctx.canvas.height);
-            ctx.stroke();
+    const video = document.getElementById("camera");
+    const canvas = document.getElementById("overlay");
+    const ctx = canvas.getContext("2d");
+    const engine = new PoseEngine({}, exercise.id);
+    const pose = new Pose({ locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${f}` });
+    pose.setOptions({ modelComplexity: 0, smoothLandmarks: true });
+
+    pose.onResults(res => {
+        if (paused) return;
+        canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+        ctx.drawImage(res.image, 0, 0, canvas.width, canvas.height);
+        if (res.poseLandmarks) {
+            const result = engine.process(res.poseLandmarks, canvas.height);
+            drawSkeleton(ctx, result.landmarks, result.color);
+            if(result.debug && result.debug.val) drawAngleText(ctx, result.debug.val+"°", result.debug.pt.x, result.debug.pt.y);
+
+            if (result.rep !== reps) {
+                reps = result.rep;
+                document.getElementById("repCount").innerText = reps;
+                let p = 0;
+                if(exercise.id.includes("plank")) p = Math.min(100, Math.round((reps / (totalSets * appData.session.timePerSet))*100));
+                else p = Math.min(100, Math.round((reps / (totalSets * targetReps))*100));
+                document.getElementById("progressBar").style.width = p+"%";
+                document.getElementById("progressText").innerText = p+"%";
+            }
         }
     });
-}
 
-class PoseEngine {
-    constructor(rule, exerciseId) {
-        this.rule = rule || {};
-        this.exerciseId = (exerciseId || "exercise").toLowerCase();
-
-        // General Variables
-        this.reps = 0;
-        this.state = "UP";
-
-        // Plank Variables
-        this.accumulatedTime = 0;
-        this.holdStartTime = null;
-
-        // Bird Dog Variables (จาก gui_upload.py)
-        this.bdState = "DOWN"; // สถานะเริ่มต้นของ Bird Dog
-        this.baselineArmY = null; // ค่า Y อ้างอิงของแขน
-        this.baselineLegY = null; // ค่า Y อ้างอิงของขา
-
-        this.prevLandmarks = null;
-        this.debugAngle = 0;
-    }
-
-    smooth(landmarks) {
-        if (!this.prevLandmarks) {
-            this.prevLandmarks = landmarks;
-            return landmarks;
-        }
-        const smoothed = landmarks.map((curr, i) => {
-            const prev = this.prevLandmarks[i];
-            const alpha = 0.5;
-            return {
-                x: prev.x * (1 - alpha) + curr.x * alpha,
-                y: prev.y * (1 - alpha) + curr.y * alpha,
-                z: prev.z * (1 - alpha) + curr.z * alpha,
-                visibility: curr.visibility
-            };
-        });
-        this.prevLandmarks = smoothed;
-        return smoothed;
-    }
-
-    process(rawLandmarks, canvasHeight) {
-        const landmarks = this.smooth(rawLandmarks);
-        let status = "FAIL";
-        let color = "#0066FF"; // Default Blue (Fail/Rest)
-
-        const p = {
-            shoulder: landmarks[11], elbow: landmarks[13], wrist: landmarks[15],
-            hip: landmarks[23], knee: landmarks[25], ankle: landmarks[27],
-            // Bird Dog Keypoints (Left/Right Wrist & Ankle)
-            l_wrist: landmarks[15], r_wrist: landmarks[16],
-            l_ankle: landmarks[27], r_ankle: landmarks[28]
-        };
-
-        const kneeAngle = calculateAngle(p.hip, p.knee, p.ankle);
-        const hipAngle = calculateAngle(p.knee, p.hip, p.shoulder);
-        const elbowAngle = calculateAngle(p.shoulder, p.elbow, p.wrist);
-
-        // --- PLANK (TIME BASED) ---
-        if (this.exerciseId.includes("plank")) {
-            const isGoodForm = hipAngle >= 160;
-            if (isGoodForm) {
-                color = "#00FF00";
-                if (this.holdStartTime === null) this.holdStartTime = Date.now();
-            } else {
-                color = "#0066FF";
-                if (this.holdStartTime !== null) {
-                    this.accumulatedTime += (Date.now() - this.holdStartTime) / 1000;
-                    this.holdStartTime = null;
-                }
-            }
-            let currentSessionTime = this.accumulatedTime;
-            if (this.holdStartTime !== null) currentSessionTime += (Date.now() - this.holdStartTime) / 1000;
-            this.reps = Math.floor(currentSessionTime);
-            this.debugAngle = Math.round(hipAngle);
-            this.debugPoint = p.hip;
-        }
-
-        // --- BIRD DOG (Logic from gui_upload.py) ---
-        else if (this.exerciseId.includes("bird_dog")) {
-            // 1. แปลงค่า Y เป็น Pixel
-            const l_wrist_y = p.l_wrist.y * canvasHeight;
-            const r_wrist_y = p.r_wrist.y * canvasHeight;
-            const l_ankle_y = p.l_ankle.y * canvasHeight;
-            const r_ankle_y = p.r_ankle.y * canvasHeight;
-
-            // 2. Set Baseline (ถ้ายังไม่มี)
-            if (this.baselineArmY === null) {
-                this.baselineArmY = (l_wrist_y + r_wrist_y) / 2;
-                this.baselineLegY = (l_ankle_y + r_ankle_y) / 2;
-            }
-
-            // 3. ตรวจสอบการเคลื่อนที่ (Movement Threshold = 6-10px)
-            const MOVE_THRESH = 10;
-            const arm_R_up = (this.baselineArmY - r_wrist_y) > MOVE_THRESH; // Y น้อยลง = ยกขึ้น
-            const arm_L_up = (this.baselineArmY - l_wrist_y) > MOVE_THRESH;
-            const leg_R_up = (this.baselineLegY - r_ankle_y) > MOVE_THRESH;
-            const leg_L_up = (this.baselineLegY - l_ankle_y) > MOVE_THRESH;
-
-            // 4. Logic: ยกแขนและขาคู่ตรงข้าม (Cross Pattern)
-            const correct_RL = arm_R_up && leg_L_up; // แขนขวา + ขาซ้าย
-            const correct_LR = arm_L_up && leg_R_up; // แขนซ้าย + ขาขวา
-
-            if (correct_RL || correct_LR) {
-                color = "#00FF00"; // Green (Correct)
-                // State Transition: DOWN -> UP
-                if (this.bdState === "DOWN") {
-                    this.bdState = "UP";
-                }
-            } else {
-                color = "#0066FF"; // Blue (Wrong/Rest)
-                // State Transition: UP -> DOWN (Count Rep)
-                if (this.bdState === "UP") {
-                    this.reps++;
-                    this.bdState = "DOWN";
-                    // Reset Baseline เพื่อรอรอบใหม่
-                    this.baselineArmY = (l_wrist_y + r_wrist_y) / 2;
-                    this.baselineLegY = (l_ankle_y + r_ankle_y) / 2;
-                }
-            }
-            this.debugAngle = null; // Bird dog ไม่ได้ดูมุม
-        }
-
-        // --- SQUAT / LUNGE / PUSHUP (ANGLE BASED) ---
-        else {
-            let angle = kneeAngle;
-            let displayPoint = p.knee;
-            let downThresh = 135;
-            let upThresh = 160;
-
-            if (this.exerciseId.includes("pushup")) {
-                angle = elbowAngle;
-                displayPoint = p.elbow;
-                downThresh = 100;
-            }
-
-            if (angle <= downThresh + 10) color = "#00FF00";
-
-            if (angle <= downThresh && this.state === "UP") this.state = "DOWN";
-            if (angle >= upThresh && this.state === "DOWN") {
-                this.reps++;
-                this.state = "UP";
-            }
-            this.debugAngle = Math.round(angle);
-            this.debugPoint = displayPoint;
-        }
-
-        return { landmarks, color, rep: this.reps, debug: {val: this.debugAngle, pt: this.debugPoint} };
-    }
-}
-
-/* =========================================================
-   2. MAIN SETUP
-========================================================= */
-
-const APP_KEY = "aiExerciseApp";
-const defaultData = {
-    workout: { id: "squat", name: "Squat", rule: { down: 100, up: 160 }, video: "" },
-    session: { timePerSet: 60, sets: 3, targetReps: 12 }
-};
-
-let appData;
-try { appData = JSON.parse(localStorage.getItem(APP_KEY)); } catch(e) {}
-if (!appData || !appData.workout) appData = defaultData;
-
-const exercise = appData.workout;
-const timePerSet = appData.session.timePerSet;
-const totalSets = appData.session.sets;
-
-// LOGIC TARGET
-let targetReps = 12;
-if (exercise.id.includes("plank")) {
-    targetReps = timePerSet;
-    document.getElementById("scoreLabel").innerText = "Hold Time (s)";
-} else {
-    targetReps = appData.session.targetReps || 12;
-    document.getElementById("scoreLabel").innerText = "Total Reps";
-}
-
-if(exercise.video) document.getElementById("demoVideo").src = exercise.video;
-
-let reps = 0, paused = false, timeLeft = timePerSet, currentSet = 1;
-
-// UI Setup
-const repEl = document.getElementById("repCount");
-const timerEl = document.getElementById("timer");
-const progressBar = document.getElementById("progressBar");
-const progressText = document.getElementById("progressText");
-document.getElementById("setCount").innerText = currentSet;
-document.getElementById("setTotal").innerText = totalSets;
-
-// Timer Loop
-setInterval(() => {
-  if (paused) return;
-  timeLeft--;
-  const m = String(Math.floor(timeLeft / 60)).padStart(2, "0");
-  const s = String(timeLeft % 60).padStart(2, "0");
-  timerEl.innerText = `${m}:${s}`;
-
-  if (timeLeft <= 0) {
-    if (currentSet >= totalSets) { finishWorkout(); return; }
-    currentSet++;
-    document.getElementById("setCount").innerText = currentSet;
-    timeLeft = timePerSet;
-  }
-}, 1000);
-
-// Camera & Engine
-const video = document.getElementById("camera");
-const canvas = document.getElementById("overlay");
-const ctx = canvas.getContext("2d");
-const engine = new PoseEngine(exercise.rule, exercise.id);
-
-async function setupCamera() {
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-            video: { width: 640, height: 480, facingMode: "user" }
-        });
+    navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } }).then(stream => {
         video.srcObject = stream;
-        return new Promise(resolve => { video.onloadedmetadata = () => resolve(video); });
-    } catch (e) { alert("Camera Error"); }
-}
-
-const pose = new Pose({ locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${f}` });
-pose.setOptions({ modelComplexity: 0, smoothLandmarks: true, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
-
-// *** PROCESSING LOOP ***
-pose.onResults(res => {
-  if (paused) return;
-
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-
-  ctx.drawImage(res.image, 0, 0, canvas.width, canvas.height);
-
-  if (res.poseLandmarks) {
-      // ส่ง canvas.height เข้าไปเพื่อใช้คำนวณ Bird Dog (Pixel based)
-      const result = engine.process(res.poseLandmarks, canvas.height);
-      drawSkeleton(ctx, result.landmarks, result.color);
-
-      if(result.debug && result.debug.val && result.debug.pt) {
-          drawAngleText(ctx, result.debug.val + "°", result.debug.pt.x, result.debug.pt.y);
-      }
-
-      if (result.rep !== reps) {
-        reps = result.rep;
-        repEl.innerText = reps;
-
-        let progress = 0;
-        if (exercise.id.includes("plank")) {
-             const totalTargetTime = totalSets * timePerSet;
-             progress = Math.min(100, Math.round((reps / totalTargetTime) * 100));
-        } else {
-             const totalTargetReps = targetReps * totalSets;
-             progress = Math.min(100, Math.round((reps / totalTargetReps) * 100));
-        }
-
-        progressBar.style.width = progress + "%";
-        progressText.innerText = progress + "%";
-      }
-  }
-});
-
-let isProcessing = false;
-setupCamera().then(() => {
-    const camera = new Camera(video, {
-        onFrame: async () => {
-            if (isProcessing || paused) return;
-            isProcessing = true;
-            await pose.send({ image: video });
-            isProcessing = false;
-        },
-        width: 640, height: 480
+        const cam = new Camera(video, { onFrame: async()=>{ if(!paused) await pose.send({image:video}); }, width: 640, height: 480 });
+        cam.start();
     });
-    camera.start();
-});
 
-// Controls
-document.getElementById("pauseBtn").onclick = function() {
-  paused = !paused;
-  this.innerText = paused ? "Resume" : "Pause";
-};
-document.getElementById("endBtn").onclick = finishWorkout;
+    document.getElementById("pauseBtn").onclick = function() { paused = !paused; this.innerText = paused ? "Resume" : "Pause"; };
+    document.getElementById("endBtn").onclick = finishWorkout;
 
-function finishWorkout() {
-  const history = JSON.parse(localStorage.getItem("workoutHistory")) || [];
-  let finalTarget = targetReps;
-  finalTarget = targetReps * totalSets;
-
-  const result = {
-    sessionNo: history.length + 1,
-    exerciseId: exercise.id || "exercise",
-    exerciseName: exercise.name || "Exercise",
-    reps: reps,
-    target: finalTarget,
-    sets: totalSets,
-    elapsedSec: (currentSet - 1) * timePerSet + (timePerSet - timeLeft),
-    timestamp: Date.now()
-  };
-  localStorage.setItem("lastResult", JSON.stringify(result));
-  history.push(result);
-  localStorage.setItem("workoutHistory", JSON.stringify(history));
-  location.href = "gread.html";
-}
+    function finishWorkout() {
+        let finalTarget = targetReps * totalSets;
+        const result = {
+            sessionNo: (JSON.parse(localStorage.getItem("workoutHistory"))||[]).length+1,
+            exerciseId: exercise.id, exerciseName: exercise.label,
+            reps, target: finalTarget, sets: totalSets,
+            elapsedSec: (currentSet-1)*appData.session.timePerSet + (appData.session.timePerSet-timeLeft),
+            timestamp: Date.now()
+        };
+        localStorage.setItem("lastResult", JSON.stringify(result));
+        const h = JSON.parse(localStorage.getItem("workoutHistory"))||[]; h.push(result);
+        localStorage.setItem("workoutHistory", JSON.stringify(h));
+        location.href = "gread.html";
+    }
 </script>
-
 </body>
 </html>

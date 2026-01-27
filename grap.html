@@ -2,199 +2,78 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Workout Analytics</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
-
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-
+<title>Analytics</title>
+<script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
 <script>
-tailwind.config = {
-  theme: {
-    extend: {
-      colors: {
-        "wireframe-bg": "#F8FAFC",
-        "wireframe-stroke": "#E2E8F0",
-        "wireframe-text": "#0F172A",
-        "wireframe-subtext": "#64748B",
-        "brand-blue": "#007BFF",
-      },
-      fontFamily: { sans: ["Inter", "sans-serif"] }
-    }
-  }
-}
+    tailwind.config = { darkMode: 'class', theme: { extend: { colors: { "brand-blue": "#007BFF" }, fontFamily: { sans: ["Inter"] } } } }
 </script>
-
-<style>
-body {
-  background-color: #f1f5f9;
-  min-height: max(884px, 100dvh);
-}
-</style>
+<script>
+    (function() {
+        try {
+            const data = JSON.parse(localStorage.getItem("aiExerciseApp"));
+            if (data && data.user && data.user.darkMode) document.documentElement.classList.add("dark");
+        } catch(e) {}
+    })();
+</script>
+<style> body { @apply bg-slate-50 dark:bg-slate-900 transition-colors duration-300; } </style>
 </head>
+<body class="flex justify-center min-h-screen text-slate-900 dark:text-white font-sans">
+<div class="w-full max-w-[430px] bg-white dark:bg-slate-900 shadow-xl flex flex-col border-x dark:border-slate-800">
+    <header class="px-6 py-4 border-b dark:border-slate-800 flex justify-between bg-white dark:bg-slate-900 sticky top-0 z-10">
+        <h1 class="text-sm font-extrabold uppercase text-brand-blue dark:text-blue-400">Analytics</h1>
+        <span class="material-symbols-outlined text-brand-blue dark:text-blue-400">analytics</span>
+    </header>
+    <main class="flex-1 px-6 pt-6 space-y-6">
+        <div class="grid grid-cols-2 gap-4">
+            <div class="bg-slate-50 dark:bg-slate-800 p-4 rounded-2xl"><p class="text-xs text-gray-400 font-bold uppercase">Sessions</p><p class="text-3xl font-black" id="totalSess">0</p></div>
+            <div class="bg-slate-50 dark:bg-slate-800 p-4 rounded-2xl"><p class="text-xs text-gray-400 font-bold uppercase">Mins</p><p class="text-3xl font-black" id="totalMin">0</p></div>
+        </div>
 
-<body class="bg-wireframe-bg text-wireframe-text font-sans antialiased
-             min-h-screen flex justify-center">
-<div class="w-full max-w-[430px] min-h-screen
-            bg-white shadow-xl border-x border-wireframe-stroke
-            flex flex-col">
+        <div id="toggleContainer" class="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
+            <button class="flex-1 py-2 text-xs font-bold rounded-lg bg-white dark:bg-slate-700 text-brand-blue dark:text-white shadow-sm transition-all" onclick="setMode('daily', this)">Daily</button>
+            <button class="flex-1 py-2 text-xs font-medium rounded-lg text-slate-500 hover:text-slate-700 dark:hover:text-slate-300" onclick="setMode('weekly', this)">Weekly</button>
+        </div>
 
-<header class="flex items-center justify-between px-6 py-4 bg-white border-b border-wireframe-stroke sticky top-0 z-20">
-  <h1 class="text-sm font-extrabold uppercase tracking-widest text-brand-blue">
-    Analytics
-  </h1>
-  <span class="material-symbols-outlined">analytics</span>
-</header>
-
-<main class="flex-1 px-6 pt-6 pb-24
-             flex flex-col gap-6">
-
-
-<div class="grid grid-cols-3 gap-3 mb-4">
-  <div class="bg-white rounded-2xl p-4 border text-center">
-    <p class="text-xs text-wireframe-subtext uppercase">Sessions</p>
-    <p id="totalSessions" class="text-2xl font-black">0</p>
-  </div>
-  <div class="bg-white rounded-2xl p-4 border text-center">
-    <p class="text-xs text-wireframe-subtext uppercase">Total Min</p>
-    <p id="totalMinutes" class="text-2xl font-black">0</p>
-  </div>
-  <div class="bg-white rounded-2xl p-4 border text-center">
-    <p class="text-xs text-wireframe-subtext uppercase">Total Reps</p>
-    <p id="totalReps" class="text-2xl font-black">0</p>
-  </div>
+        <div class="border dark:border-slate-700 rounded-2xl p-4 bg-white dark:bg-slate-800">
+            <h2 class="text-sm font-bold mb-4">Activity</h2>
+            <canvas id="chart"></canvas>
+        </div>
+    </main>
+    <nav class="border-t dark:border-slate-800 px-8 py-3 flex justify-between bg-white dark:bg-slate-900 mt-auto sticky bottom-0">
+        <a href="5.html" class="flex flex-col items-center text-gray-400 dark:text-slate-500"><span class="material-symbols-outlined">fitness_center</span><span class="text-[10px] font-bold">Workouts</span></a>
+        <a href="grap.html" class="flex flex-col items-center text-brand-blue dark:text-blue-400"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">analytics</span><span class="text-[10px] font-bold">Analytics</span></a>
+        <a href="1.html" class="flex flex-col items-center text-gray-400 dark:text-slate-500"><span class="material-symbols-outlined">person</span><span class="text-[10px] font-bold">Profile</span></a>
+    </nav>
 </div>
-
-<div id="toggleContainer" class="mb-6 flex w-full rounded-xl bg-slate-100 p-1">
-  <button id="btnDaily" class="flex flex-1 items-center justify-center rounded-lg bg-white py-2 text-xs font-bold text-brand-blue shadow-sm transition-all" onclick="setMode('daily', this)">Daily</button>
-  <button id="btnWeekly" class="flex flex-1 items-center justify-center rounded-lg bg-transparent py-2 text-xs font-medium text-slate-500 hover:text-slate-700 transition-all" onclick="setMode('weekly', this)">Weekly</button>
-  <button id="btnMonthly" class="flex flex-1 items-center justify-center rounded-lg bg-transparent py-2 text-xs font-medium text-slate-500 hover:text-slate-700 transition-all" onclick="setMode('monthly', this)">Monthly</button>
-</div>
-
-<div class="bg-white border rounded-2xl p-4">
-  <h2 id="chartTitle" class="text-sm font-bold mb-2">
-    Workout Time (Minutes / Day)
-  </h2>
-  <canvas id="workoutChart" height="180"></canvas>
-</div>
-
-</main>
-
-<footer class="fixed bottom-0 left-0 right-0 max-w-[430px] mx-auto bg-white border-t px-6 py-4">
-  <button onclick="location.href='5.html'"
-    class="w-full h-12 bg-brand-blue text-white font-bold rounded-xl">
-    Back to Home
-  </button>
-</footer>
-
 <script>
-/* ---------- LOAD REAL DATA ---------- */
-const history = JSON.parse(localStorage.getItem("workoutHistory")) || [];
+    const hist = JSON.parse(localStorage.getItem("workoutHistory")) || [];
+    document.getElementById("totalSess").innerText = hist.length;
+    document.getElementById("totalMin").innerText = Math.floor(hist.reduce((a,b)=>a+(b.elapsedSec||0),0)/60);
 
-/* ---------- SUMMARY ---------- */
-document.getElementById("totalSessions").innerText = history.length;
-document.getElementById("totalMinutes").innerText =
-  Math.floor(history.reduce((s, x) => s + (x.elapsedSec || 0), 0) / 60);
-document.getElementById("totalReps").innerText =
-  history.reduce((s, x) => s + (x.reps || 0), 0);
+    let chart;
+    function renderChart(mode) {
+        // Mock logic for demo (Real logic in previous step)
+        const labels = hist.map((_,i)=>`S${i+1}`);
+        const data = hist.map(h=>Math.round((h.elapsedSec||0)/60));
 
-/* ---------- UTIL ---------- */
-function getWeekKey(date) {
-  const d = new Date(date);
-  d.setHours(0,0,0,0);
-  d.setDate(d.getDate() + 4 - (d.getDay() || 7));
-  const yearStart = new Date(d.getFullYear(),0,1);
-  const week = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
-  return `${d.getFullYear()}-W${week}`;
-}
-
-function groupData(mode) {
-  const map = {};
-  history.forEach(s => {
-    let key;
-    const d = new Date(s.timestamp);
-    if (mode === "daily") {
-      key = d.toLocaleDateString();
-    } else if (mode === "weekly") {
-      key = getWeekKey(d);
-    } else {
-      key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
+        if(chart) chart.destroy();
+        chart = new Chart(document.getElementById("chart"), {
+            type: 'bar',
+            data: { labels, datasets: [{ label:'Mins', data, backgroundColor:'#3b82f6', borderRadius:4 }] },
+            options: { scales: { y: { beginAtZero:true, grid:{color:'#e2e8f0'} }, x: { grid:{display:false} } } }
+        });
     }
-    map[key] = (map[key] || 0) + Math.round((s.elapsedSec || 0) / 60);
-  });
-  return map;
-}
 
-/* ---------- CHART ---------- */
-let chart;
-function renderChart(mode) {
-  const map = groupData(mode);
-  const labels = Object.keys(map);
-  const data = Object.values(map);
-
-  document.getElementById("chartTitle").innerText =
-    mode === "daily"
-      ? "Workout Time (Minutes / Day)"
-      : mode === "weekly"
-      ? "Workout Time (Minutes / Week)"
-      : "Workout Time (Minutes / Month)";
-
-  if (chart) chart.destroy();
-
-  chart = new Chart(document.getElementById("workoutChart"), {
-    type: "line",
-    data: {
-      labels,
-      datasets: [{
-        data,
-        borderColor: "#007BFF",
-        backgroundColor: "rgba(0,123,255,0.15)",
-        fill: true,
-        tension: 0.4,
-        pointRadius: 4
-      }]
-    },
-    options: {
-      plugins: { legend: { display: false } },
-      scales: { y: { beginAtZero: true } }
+    function setMode(mode, btn) {
+        const btns = document.querySelectorAll("#toggleContainer button");
+        btns.forEach(b => { b.className = "flex-1 py-2 text-xs font-medium rounded-lg text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"; });
+        btn.className = "flex-1 py-2 text-xs font-bold rounded-lg bg-white dark:bg-slate-700 text-brand-blue dark:text-white shadow-sm transition-all";
+        renderChart(mode);
     }
-  });
-}
-
-/* ---------- TOGGLE LOGIC (FIXED) ---------- */
-function setMode(mode, clickedBtn) {
-  // 1. Reset all buttons to "Inactive" style
-  const buttons = document.querySelectorAll("#toggleContainer button");
-
-  // Class สำหรับปุ่มที่ *ไม่ได้เลือก*
-  const inactiveClasses = ["bg-transparent", "text-slate-500", "font-medium"];
-  // Class สำหรับปุ่มที่ *เลือกอยู่*
-  const activeClasses = ["bg-white", "text-brand-blue", "font-bold", "shadow-sm"];
-
-  buttons.forEach(btn => {
-    // ลบ Active class ออกให้หมด
-    btn.classList.remove(...activeClasses);
-    // ใส่ Inactive class เข้าไป
-    btn.classList.add(...inactiveClasses);
-  });
-
-  // 2. Set "Active" style to the clicked button
-  clickedBtn.classList.remove(...inactiveClasses);
-  clickedBtn.classList.add(...activeClasses);
-
-  // 3. Render Chart
-  renderChart(mode);
-}
-
-/* ---------- INIT ---------- */
-// เริ่มต้นเรียก renderChart แบบ daily แต่ไม่ต้องเซ็ตปุ่ม เพราะ HTML เซ็ตค่าเริ่มต้นไว้แล้ว
-renderChart("daily");
+    renderChart('daily');
 </script>
-
-</div>
 </body>
 </html>
