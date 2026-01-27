@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AI Exercise - Welcome</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+<script>
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    "primary": "#f48c25",
+                    "background-light": "#ffffff",
+                    "background-dark": "#111827", // slate-900 equivalent
+                },
+                fontFamily: { "display": ["Lexend", "sans-serif"] },
+                borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+            },
+        },
+    }
+</script>
+<script>
+    (function() {
+        try {
+            const data = JSON.parse(localStorage.getItem("aiExerciseApp"));
+            if (data && data.user && data.user.darkMode) document.documentElement.classList.add("dark");
+        } catch(e) {}
+    })();
+</script>
+
+<style>
+    body { font-family: 'Lexend', sans-serif; min-height: max(884px, 100dvh); }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+</style>
+</head>
+
+<body class="bg-background-light dark:bg-slate-900 text-[#181411] dark:text-white transition-colors duration-300">
+<div class="relative flex min-h-screen w-full flex-col max-w-[430px] mx-auto overflow-x-hidden bg-white dark:bg-slate-900 shadow-2xl border-x dark:border-slate-800">
+
+    <header class="flex flex-col items-center bg-transparent pt-10 pb-4">
+        <div class="flex items-center justify-center gap-2 mb-2">
+            <div class="bg-primary text-white p-2 rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
+                <span class="material-symbols-outlined !text-[32px]">fitness_center</span>
+            </div>
+        </div>
+        <h1 class="text-[#181411] dark:text-white text-2xl font-bold leading-tight tracking-[-0.015em] font-display">
+            AI EXERCISE
+        </h1>
+    </header>
+
+    <main class="flex-1 flex flex-col items-center px-4">
+        <div class="w-full mt-4 mb-6">
+            <div class="relative w-full aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl">
+                <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1000&auto=format&fit=crop"
+                     class="w-full h-full object-cover" alt="Workout">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+
+                <div class="absolute bottom-6 left-6 right-6 text-white">
+                    <p class="font-bold text-lg">AI-Powered Tracking</p>
+                    <p class="text-xs opacity-80">Real-time form correction with camera</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="w-full text-center space-y-2 mb-8">
+            <h2 class="text-[#181411] dark:text-white text-[28px] font-bold leading-tight tracking-[-0.015em] px-4 font-display">
+                Elevate Your Fitness
+            </h2>
+            <p class="text-[#181411]/70 dark:text-slate-400 text-base font-normal leading-normal px-8 font-display">
+                Your AI-Powered Fitness Journey Starts Here. Personalized workouts tailored to your goals.
+            </p>
+        </div>
+    </main>
+
+    <footer class="pb-12 px-6">
+        <div class="flex flex-col gap-4 w-full">
+            <button onclick="location.href='2.html'" class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-2xl h-14 px-5 bg-primary text-white text-lg font-bold leading-normal tracking-[0.015em] w-full shadow-lg shadow-primary/30 active:scale-[0.98] transition-transform">
+                <span class="truncate">CREATE PROFILE</span>
+            </button>
+
+            <button onclick="checkLogin()" class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-2xl h-14 px-5 bg-[#f5f2f0] dark:bg-slate-800 text-[#181411] dark:text-white text-lg font-bold leading-normal tracking-[0.015em] w-full active:scale-[0.98] transition-transform border border-[#e5e7eb] dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700">
+                <span class="truncate">LOGIN</span>
+            </button>
+        </div>
+
+        <p class="mt-6 text-center text-xs text-[#181411]/40 dark:text-slate-500 px-4">
+            By continuing, you agree to our <a class="underline hover:text-primary" href="#">Terms</a> and <a class="underline hover:text-primary" href="#">Privacy Policy</a>.
+        </p>
+    </footer>
+
+    <div class="h-8 w-full"></div>
+</div>
+
+<script>
+    function checkLogin() {
+        // เช็คว่ามีข้อมูล User หรือยัง
+        const data = JSON.parse(localStorage.getItem("aiExerciseApp"));
+        if (data && data.user && data.user.name) {
+            location.href = '5.html'; // มีแล้วไปหน้าเลือกท่า
+        } else {
+            // ยังไม่มี -> ไปหน้าสร้างโปรไฟล์ (หรือจะ Alert ก็ได้)
+            if(confirm("No profile found on this device. Create one?")) {
+                location.href = '2.html';
+            }
+        }
+    }
+</script>
+</body>
+</html>

@@ -17,10 +17,7 @@
                 fontFamily: { "display": ["Lexend", "sans-serif"] },
                 colors: {
                     brand: {
-                        blue: '#0B2447',
-                        accent: '#19376D',
-                        orange: '#F97316',
-                        light: '#E6F0FF',
+                        blue: '#0B2447', accent: '#19376D', orange: '#F97316', light: '#E6F0FF',
                     }
                 },
                 boxShadow: {
@@ -31,23 +28,17 @@
         }
     }
 </script>
-
 <script>
     (function() {
         try {
             const data = JSON.parse(localStorage.getItem("aiExerciseApp"));
-            if (data && data.user && data.user.darkMode) {
-                document.documentElement.classList.add("dark");
-            } else {
-                document.documentElement.classList.remove("dark");
-            }
+            if (data && data.user && data.user.darkMode) document.documentElement.classList.add("dark");
         } catch (e) {}
     })();
 </script>
 
 <style type="text/tailwindcss">
     :root { --ios-safe-bottom: 34px; }
-    /* ปรับพื้นหลังรองรับ Dark Mode */
     body { @apply bg-slate-50 dark:bg-slate-900 transition-colors duration-300; -webkit-tap-highlight-color: transparent; }
     .phone-container {
         width: 100%; max-width: 430px; margin: 0 auto; min-height: 100dvh; position: relative;
@@ -92,44 +83,21 @@
 <section class="mb-8">
   <div class="bg-white dark:bg-slate-800 p-5 rounded-[28px] border border-gray-100 dark:border-slate-700 shadow-soft">
     <div class="flex items-center justify-between mb-4">
-      <h3 class="text-xs font-bold text-brand-blue dark:text-blue-400 uppercase tracking-widest">
-        Today's Goal
-      </h3>
-      <span id="goalPercent" class="text-xs font-bold text-brand-orange">
-        0% Complete
-      </span>
+      <h3 class="text-xs font-bold text-brand-blue dark:text-blue-400 uppercase tracking-widest">Today's Goal</h3>
+      <span id="goalPercent" class="text-xs font-bold text-brand-orange">0% Complete</span>
     </div>
-
     <div class="flex gap-4">
       <div class="flex-1 flex flex-col gap-1">
-        <p class="text-xl font-black text-brand-blue dark:text-white">
-          <span id="todayKcal">0</span>
-          <span class="text-[10px] text-slate-400 uppercase font-bold">kcal</span>
-        </p>
-        <div class="w-full bg-gray-100 dark:bg-slate-700 h-1.5 rounded-full">
-          <div id="kcalBar"
-               class="bg-brand-orange h-full rounded-full"
-               style="width: 0%;">
-          </div>
-        </div>
+        <p class="text-xl font-black text-brand-blue dark:text-white"><span id="todayKcal">0</span><span class="text-[10px] text-slate-400 uppercase font-bold">kcal</span></p>
+        <div class="w-full bg-gray-100 dark:bg-slate-700 h-1.5 rounded-full"><div id="kcalBar" class="bg-brand-orange h-full rounded-full" style="width: 0%;"></div></div>
       </div>
-
       <div class="flex-1 flex flex-col gap-1">
-        <p class="text-xl font-black text-brand-blue dark:text-white">
-          <span id="todayMin">0</span>
-          <span class="text-[10px] text-slate-400 uppercase font-bold">min</span>
-        </p>
-        <div class="w-full bg-gray-100 dark:bg-slate-700 h-1.5 rounded-full">
-          <div id="timeBar"
-               class="bg-brand-blue dark:bg-blue-500 h-full rounded-full"
-               style="width: 0%;">
-          </div>
-        </div>
+        <p class="text-xl font-black text-brand-blue dark:text-white"><span id="todayMin">0</span><span class="text-[10px] text-slate-400 uppercase font-bold">min</span></p>
+        <div class="w-full bg-gray-100 dark:bg-slate-700 h-1.5 rounded-full"><div id="timeBar" class="bg-brand-blue dark:bg-blue-500 h-full rounded-full" style="width: 0%;"></div></div>
       </div>
     </div>
   </div>
 </section>
-
 
 <section class="mb-6">
 <div class="flex items-center justify-between mb-4">
@@ -137,8 +105,8 @@
 <button class="text-xs font-bold text-brand-orange uppercase">See All</button>
 </div>
 <div id="workoutGrid" class="grid grid-cols-2 gap-4"></div>
-
 </section>
+
 <div class="flex justify-center items-center gap-1 opacity-20 py-8 select-none">
 <span class="material-symbols-outlined text-brand-blue dark:text-white text-2xl" style="font-variation-settings: 'FILL' 1, 'wght' 700;">fitness_center</span>
 <span class="text-xl font-black italic tracking-tighter text-brand-blue dark:text-white">AI</span>
@@ -146,32 +114,13 @@
 </div>
 </main>
 <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-t border-gray-100 dark:border-slate-800 px-10 pt-3 pb-[calc(10px+var(--ios-safe-bottom))] z-50 flex justify-between items-center shadow-[0_-8px_20px_rgba(0,0,0,0.04)]">
-<button onclick="location.href='5.html'"
-  class="flex flex-col items-center gap-1 nav-active">
-  <span class="material-symbols-outlined">fitness_center</span>
-  <span class="text-[10px] font-bold">Workouts</span>
-</button>
-
-<button onclick="location.href='grap.html'"
-  class="flex flex-col items-center gap-1 group text-slate-400 dark:text-slate-500 hover:text-brand-blue dark:hover:text-blue-400 transition-colors">
-  <span class="material-symbols-outlined">analytics</span>
-  <span class="text-[10px] font-bold">Analytics</span>
-</button>
-
-<button onclick="location.href='1.html'"
-  class="flex flex-col items-center gap-1 group text-slate-400 dark:text-slate-500 hover:text-brand-blue dark:hover:text-blue-400 transition-colors">
-  <span class="material-symbols-outlined">person</span>
-  <span class="text-[10px] font-bold">Profile</span>
-</button>
-
+<button onclick="location.href='5.html'" class="flex flex-col items-center gap-1 nav-active"><span class="material-symbols-outlined">fitness_center</span><span class="text-[10px] font-bold">Workouts</span></button>
+<button onclick="location.href='grap.html'" class="flex flex-col items-center gap-1 group text-slate-400 dark:text-slate-500 hover:text-brand-blue dark:hover:text-blue-400 transition-colors"><span class="material-symbols-outlined">analytics</span><span class="text-[10px] font-bold">Analytics</span></button>
+<button onclick="location.href='1.html'" class="flex flex-col items-center gap-1 group text-slate-400 dark:text-slate-500 hover:text-brand-blue dark:hover:text-blue-400 transition-colors"><span class="material-symbols-outlined">person</span><span class="text-[10px] font-bold">Profile</span></button>
 </nav>
 </div>
 <script>
-/* =========================
-   CONFIG
-========================= */
 const APP_KEY = "aiExerciseApp";
-// EXERCISE DATA (Mock up inside script for standalone testing)
 const MOCK_EXERCISES = {
     "squat": { label: "Squat", rep: "12 Reps", file: "squat.json", video: "squat.mp4", image: "squat.png" },
     "pushup": { label: "Push Up", rep: "10 Reps", file: "pushup.json", video: "pushup.mp4", image: "pushup.png" },
@@ -180,132 +129,61 @@ const MOCK_EXERCISES = {
     "bird_dog": { label: "Bird Dog", rep: "10 Reps", file: "bird_dog.json", video: "bird_dog.mp4", image: "bird_dog.png" }
 };
 
-/* =========================
-   GUARD: ต้องมี user
-========================= */
-
 const appData = JSON.parse(localStorage.getItem(APP_KEY));
 if (!appData || !appData.user) {
-  window.location.href = "2.html";
+  window.location.href = "6.html"; // Guard: ดีดกลับไปหน้า 6.html
 }
-/* =========================
-   WELCOME USER NAME
-========================= */
+
 const welcomeEl = document.getElementById("welcomeName");
+if (welcomeEl && appData.user?.name) { welcomeEl.innerText = `Hi!  ${appData.user.name}👋`; }
 
-if (welcomeEl && appData.user?.name) {
-  welcomeEl.innerText = `Hi!  ${appData.user.name}👋`;
-}
-
-/* =========================
-   TODAY'S GOAL (REAL DATA)
-========================= */
-
-const DAILY_TARGET_MIN = 60;   // เป้าหมายเวลา / วัน
-const DAILY_TARGET_KCAL = 400; // เป้าหมาย kcal / วัน
-
+const DAILY_TARGET_MIN = 60; const DAILY_TARGET_KCAL = 400;
 const history = JSON.parse(localStorage.getItem("workoutHistory")) || [];
-
-// เอาเฉพาะของ "วันนี้"
 const todayKey = new Date().toDateString();
-
-const todaySessions = history.filter(h =>
-  new Date(h.timestamp).toDateString() === todayKey
-);
-
-// รวมเวลา (วินาที → นาที)
-const totalSec = todaySessions.reduce(
-  (sum, s) => sum + (s.elapsedSec || 0), 0
-);
+const todaySessions = history.filter(h => new Date(h.timestamp).toDateString() === todayKey);
+const totalSec = todaySessions.reduce((sum, s) => sum + (s.elapsedSec || 0), 0);
 const totalMin = Math.floor(totalSec / 60);
-
-// รวม kcal (ถ้าไม่มี kcal → คำนวณคร่าว ๆ)
-const totalKcal = Math.round(
-  todaySessions.reduce((sum, s) => {
+const totalKcal = Math.round(todaySessions.reduce((sum, s) => {
     if (s.kcal) return sum + s.kcal;
-    // fallback: 8 kcal / นาที (ประมาณ HIIT)
     return sum + ((s.elapsedSec || 0) / 60) * 8;
-  }, 0)
-);
-
-// % progress
+}, 0));
 const timePercent = Math.min(100, Math.round((totalMin / DAILY_TARGET_MIN) * 100));
 const kcalPercent = Math.min(100, Math.round((totalKcal / DAILY_TARGET_KCAL) * 100));
 const overallPercent = Math.max(timePercent, kcalPercent);
 
-// bind UI
 document.getElementById("todayMin").innerText = totalMin;
 document.getElementById("todayKcal").innerText = totalKcal;
-
 document.getElementById("timeBar").style.width = timePercent + "%";
 document.getElementById("kcalBar").style.width = kcalPercent + "%";
+document.getElementById("goalPercent").innerText = `${overallPercent}% Complete`;
 
-document.getElementById("goalPercent").innerText =
-  `${overallPercent}% Complete`;
-
-/* =========================
-   RENDER GRID
-========================= */
 function renderWorkoutGrid() {
   const grid = document.getElementById("workoutGrid");
   grid.innerHTML = "";
-
   Object.entries(MOCK_EXERCISES).forEach(([id, ex]) => {
     const card = document.createElement("div");
-
-    // เพิ่ม dark:bg-slate-800 dark:border-slate-700
-    card.className = `
-      bg-white dark:bg-slate-800 p-4 rounded-3xl
-      border border-gray-100 dark:border-slate-700 shadow-card
-      flex flex-col gap-3
-      cursor-pointer
-      hover:scale-[1.03]
-      transition
-    `;
-
+    card.className = `bg-white dark:bg-slate-800 p-4 rounded-3xl border border-gray-100 dark:border-slate-700 shadow-card flex flex-col gap-3 cursor-pointer hover:scale-[1.03] transition`;
     card.innerHTML = `
       <div class="w-12 h-12 rounded-2xl bg-orange-50 dark:bg-slate-700 flex items-center justify-center text-brand-orange">
         <span class="material-symbols-outlined text-2xl">fitness_center</span>
       </div>
-
       <div>
         <p class="font-bold text-brand-blue dark:text-blue-400">${ex.label}</p>
-        <p class="text-[10px] text-slate-400 font-bold uppercase">
-          ${ex.rep}
-        </p>
+        <p class="text-[10px] text-slate-400 font-bold uppercase">${ex.rep}</p>
       </div>
     `;
-
     card.addEventListener("click", () => selectExercise(id, ex));
     grid.appendChild(card);
   });
 }
 
-/* =========================
-   SELECT EXERCISE
-========================= */
 function selectExercise(id, ex) {
   const appData = JSON.parse(localStorage.getItem(APP_KEY));
-
-  appData.workout = {
-    id: id,
-    label: ex.label,
-    ruleFile: `./${ex.file}`,
-    video: `./assets/videos/${ex.video}`,
-    image: `./assets/images/${ex.image}`,
-    repType: ex.rep
-  };
-
+  appData.workout = { id: id, label: ex.label, ruleFile: `./${ex.file}`, video: `./assets/videos/${ex.video}`, image: `./assets/images/${ex.image}`, repType: ex.rep };
   localStorage.setItem(APP_KEY, JSON.stringify(appData));
-
-  // ไปหน้า Exercise Setup
   window.location.href = "4.html";
 }
-
-/* =========================
-   INIT
-========================= */
 renderWorkoutGrid();
 </script>
-
-</body></html>
+</body>
+</html>
