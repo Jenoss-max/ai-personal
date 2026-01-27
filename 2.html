@@ -65,7 +65,7 @@
 <body class="font-display antialiased text-slate-900">
 <div class="phone-container">
 <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 px-6 py-4 flex items-center justify-between">
-<button class="flex items-center justify-center p-2 rounded-full hover:bg-gray-50 transition-colors text-brand-blue">
+<button class="flex items-center justify-center p-2 rounded-full hover:bg-gray-50 transition-colors text-brand-blue" onclick="history.back()">
 <span class="material-symbols-outlined text-2xl font-bold">arrow_back</span>
 </button>
 <div class="flex items-center gap-1 select-none">
@@ -180,6 +180,20 @@
 ========================= */
 const APP_KEY = "aiExerciseApp";
 
+/* ----------------------------------------------------
+   AUTO-REDIRECT LOGIC (ส่วนที่เพิ่มใหม่)
+   ถ้ามีข้อมูล User แล้ว และไม่ได้กดมาจากปุ่ม Edit
+   ให้ข้ามไปหน้า 5.html เลย
+---------------------------------------------------- */
+const urlParams = new URLSearchParams(window.location.search);
+const isEditing = urlParams.has('edit'); // เช็คว่ามี ?edit=1 ใน URL ไหม
+
+const checkData = JSON.parse(localStorage.getItem(APP_KEY));
+// ถ้ามีข้อมูล User และ ไม่ได้กำลัง Edit -> ไปหน้า Home
+if (checkData && checkData.user && !isEditing) {
+    window.location.href = "5.html";
+}
+
 /* =========================
    Gender Selection
 ========================= */
@@ -216,8 +230,11 @@ document.getElementById("completeProfileBtn").addEventListener("click", () => {
 
   const bmi = (weight / Math.pow(height / 100, 2)).toFixed(1);
 
-  const appData = {
-    user: {
+  // โหลดข้อมูลเก่ามา (ถ้ามี) เพื่อไม่ให้หาย
+  let currentData = JSON.parse(localStorage.getItem(APP_KEY)) || {};
+
+  // อัปเดตเฉพาะส่วน User
+  currentData.user = {
       name,
       age,
       gender: selectedGender,
@@ -225,14 +242,37 @@ document.getElementById("completeProfileBtn").addEventListener("click", () => {
       weight,
       goalWeight,
       bmi
-    }
   };
 
-  localStorage.setItem(APP_KEY, JSON.stringify(appData));
+  localStorage.setItem(APP_KEY, JSON.stringify(currentData));
 
   // 👉 ไปหน้า Home
   window.location.href = "5.html";
 });
+
+/* ถ้าเป็นการ Edit ให้ดึงข้อมูลเก่ามาโชว์ */
+if (isEditing && checkData && checkData.user) {
+    const u = checkData.user;
+    document.getElementById("fullName").value = u.name || "";
+    document.getElementById("age").value = u.age || "";
+    document.getElementById("height").value = u.height || "";
+    document.getElementById("currentWeight").value = u.weight || "";
+    document.getElementById("targetWeight").value = u.goalWeight || "";
+
+    // เลือกเพศ
+    if(u.gender) {
+        selectedGender = u.gender;
+        document.querySelectorAll("[data-gender]").forEach(b => {
+            if(b.innerText === u.gender) {
+                b.classList.add("bg-white", "text-brand-blue", "shadow-sm");
+                b.classList.remove("bg-transparent", "text-gray-400");
+            }
+        });
+    }
+
+    // เปลี่ยนข้อความปุ่มหน่อย
+    document.getElementById("completeProfileBtn").innerHTML = `Update Profile <span class="material-symbols-outlined">check</span>`;
+}
 </script>
 
 </body></html>

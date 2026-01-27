@@ -5,11 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Profile</title>
 
-<!-- Fonts & Icons -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
 
-<!-- Tailwind -->
 <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
 
 <script>
@@ -37,7 +35,6 @@ tailwind.config = {
             shadow-xl border-x border-slate-700
             flex flex-col">
 
-<!-- ================= HEADER ================= -->
 <header class="flex items-center justify-between px-6 py-4 bg-white dark:bg-slate-800 border-b dark:border-slate-700">
   <h1 class="text-sm font-extrabold uppercase tracking-widest text-brand-blue">
     Profile
@@ -46,7 +43,6 @@ tailwind.config = {
 
 <main class="flex-1 px-6 pt-6 pb-28 space-y-6">
 
-<!-- USER CARD -->
 <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 border dark:border-slate-700 text-center">
   <div class="w-20 h-20 rounded-full bg-brand-light dark:bg-slate-700 mx-auto flex items-center justify-center text-3xl font-black">
     👤
@@ -58,7 +54,6 @@ tailwind.config = {
   </button>
 </div>
 
-<!-- STATS -->
 <div class="grid grid-cols-3 gap-3">
   <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border dark:border-slate-700 text-center">
     <p class="text-xs text-slate-500">Height</p>
@@ -74,7 +69,6 @@ tailwind.config = {
   </div>
 </div>
 
-<!-- SETTINGS -->
 <div class="bg-white dark:bg-slate-800 rounded-2xl p-4 border dark:border-slate-700 space-y-3">
   <div class="flex items-center justify-between">
     <span class="font-semibold">Dark Mode</span>
@@ -90,7 +84,6 @@ tailwind.config = {
 
 </main>
 
-<!-- ================= BOTTOM NAV ================= -->
 <nav class="fixed bottom-0 left-0 right-0 max-w-[430px] mx-auto bg-white dark:bg-slate-800 border-t dark:border-slate-700 px-10 py-4 flex justify-between">
 <button onclick="location.href='5.html'"
   class="flex flex-col items-center gap-1 nav-active">
@@ -114,7 +107,6 @@ tailwind.config = {
 
 </nav>
 
-<!-- ================= LOGIC ================= -->
 <script>
 /* =========================
    LOAD USER FROM CREATE PROFILE
@@ -137,9 +129,10 @@ document.getElementById("weight").innerText = user.weight ?? 0;
 document.getElementById("goal").innerText = user.goalWeight ?? 0;
 
 
-/* ---------- EDIT PROFILE ---------- */
+/* ---------- EDIT PROFILE (แก้ไขลิงก์ตรงนี้) ---------- */
 document.getElementById("editProfileBtn").onclick = () => {
-  location.href = "2.html";
+  // ส่งค่า edit=1 เพื่อบอกหน้า 2 ว่าไม่ต้อง Auto-Redirect
+  location.href = "2.html?edit=1";
 };
 
 
@@ -153,14 +146,16 @@ if (user.darkMode) {
 
 darkToggle.onchange = () => {
   user.darkMode = darkToggle.checked;
-  localStorage.setItem("userProfile", JSON.stringify(user));
+  // อัปเดตเฉพาะค่า darkMode ลงใน object เดิม
+  appData.user.darkMode = user.darkMode;
+  localStorage.setItem(APP_KEY, JSON.stringify(appData));
   document.documentElement.classList.toggle("dark", user.darkMode);
 };
 
 /* ---------- SIGN OUT ---------- */
 document.getElementById("signOutBtn").onclick = () => {
   localStorage.clear();
-  location.href = "index.html";
+  location.href = "2.html"; // กลับไปหน้า Register
 };
 </script>
 
