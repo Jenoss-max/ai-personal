@@ -14,7 +14,7 @@
 
 <script>
 tailwind.config = {
-  darkMode: 'class', // เพิ่มบรรทัดนี้
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
@@ -23,6 +23,7 @@ tailwind.config = {
         "wireframe-text": "#0F172A",
         "wireframe-subtext": "#64748B",
         "brand-blue": "#007BFF",
+        "brand-orange": "#FF8C00",
       },
       fontFamily: { sans: ["Inter", "sans-serif"] }
     }
@@ -43,7 +44,6 @@ tailwind.config = {
 
 <style>
 body {
-  /* ลบ background-color เดิมออก ให้คลาส Tailwind จัดการ */
   min-height: max(884px, 100dvh);
 }
 </style>
@@ -63,10 +63,9 @@ body {
   <span class="material-symbols-outlined text-brand-blue dark:text-blue-400">analytics</span>
 </header>
 
-<main class="flex-1 px-6 pt-6 pb-24
-             flex flex-col gap-6">
+<main class="flex-1 px-6 pt-6 pb-24 flex flex-col gap-6">
 
-<div class="grid grid-cols-3 gap-3 mb-4">
+<div class="grid grid-cols-3 gap-3 mb-2">
   <div class="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 text-center shadow-sm">
     <p class="text-xs text-slate-500 dark:text-slate-400 uppercase">Sessions</p>
     <p id="totalSessions" class="text-2xl font-black dark:text-white">0</p>
@@ -81,7 +80,7 @@ body {
   </div>
 </div>
 
-<div id="toggleContainer" class="mb-6 flex w-full rounded-xl bg-slate-100 dark:bg-slate-800 p-1">
+<div id="toggleContainer" class="flex w-full rounded-xl bg-slate-100 dark:bg-slate-800 p-1">
   <button id="btnDaily" class="flex flex-1 items-center justify-center rounded-lg bg-white dark:bg-slate-600 py-2 text-xs font-bold text-brand-blue dark:text-white shadow-sm transition-all" onclick="setMode('daily', this)">Daily</button>
   <button id="btnWeekly" class="flex flex-1 items-center justify-center rounded-lg bg-transparent py-2 text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-all" onclick="setMode('weekly', this)">Weekly</button>
   <button id="btnMonthly" class="flex flex-1 items-center justify-center rounded-lg bg-transparent py-2 text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-all" onclick="setMode('monthly', this)">Monthly</button>
@@ -89,9 +88,21 @@ body {
 
 <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 shadow-sm">
   <h2 id="chartTitle" class="text-sm font-bold mb-2 dark:text-white">
-    Workout Time (Minutes / Day)
+    Workout Time (Minutes)
   </h2>
-  <canvas id="workoutChart" height="180"></canvas>
+  <div class="relative h-48 w-full">
+    <canvas id="workoutChart"></canvas>
+  </div>
+</div>
+
+<div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 shadow-sm">
+  <div class="flex justify-between items-center mb-2">
+    <h2 class="text-sm font-bold dark:text-white">Weight Progress</h2>
+    <span class="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-bold dark:bg-green-900/30 dark:text-green-400">Goal: <span id="goalWeightDisplay">--</span> kg</span>
+  </div>
+  <div class="relative h-48 w-full">
+    <canvas id="weightChart"></canvas>
+  </div>
 </div>
 
 </main>
@@ -104,17 +115,24 @@ body {
 </footer>
 
 <script>
-/* ---------- LOAD REAL DATA ---------- */
+/* ---------- DATA LOADING ---------- */
+const APP_KEY = "aiExerciseApp";
+const appData = JSON.parse(localStorage.getItem(APP_KEY)) || {};
 const history = JSON.parse(localStorage.getItem("workoutHistory")) || [];
 
-/* ---------- SUMMARY ---------- */
+// ดึงข้อมูลเป้าหมายน้ำหนัก
+const userGoal = appData.user ? appData.user.goalWeight : 0;
+const userCurrentWeight = appData.user ? appData.user.weight : 0;
+document.getElementById("goalWeightDisplay").innerText = userGoal || "--";
+
+/* ---------- SUMMARY STATS ---------- */
 document.getElementById("totalSessions").innerText = history.length;
 document.getElementById("totalMinutes").innerText =
   Math.floor(history.reduce((s, x) => s + (x.elapsedSec || 0), 0) / 60);
 document.getElementById("totalReps").innerText =
   history.reduce((s, x) => s + (x.reps || 0), 0);
 
-/* ---------- UTIL ---------- */
+/* ---------- UTIL: DATE GROUPING ---------- */
 function getWeekKey(date) {
   const d = new Date(date);
   d.setHours(0,0,0,0);
@@ -130,92 +148,173 @@ function groupData(mode) {
     let key;
     const d = new Date(s.timestamp);
     if (mode === "daily") {
-      key = d.toLocaleDateString();
+      key = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     } else if (mode === "weekly") {
       key = getWeekKey(d);
     } else {
-      key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
+      key = d.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
     }
     map[key] = (map[key] || 0) + Math.round((s.elapsedSec || 0) / 60);
   });
   return map;
 }
 
-/* ---------- CHART ---------- */
-let chart;
-function renderChart(mode) {
+/* ---------- CHART CONFIG ---------- */
+const isDark = document.documentElement.classList.contains('dark');
+const gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
+const tickColor = isDark ? '#94a3b8' : '#64748b';
+
+let workoutChartInstance;
+let weightChartInstance;
+
+function renderWorkoutChart(mode) {
   const map = groupData(mode);
   const labels = Object.keys(map);
   const data = Object.values(map);
 
-  document.getElementById("chartTitle").innerText =
-    mode === "daily"
-      ? "Workout Time (Minutes / Day)"
-      : mode === "weekly"
-      ? "Workout Time (Minutes / Week)"
-      : "Workout Time (Minutes / Month)";
+  const ctx = document.getElementById("workoutChart").getContext('2d');
+  if (workoutChartInstance) workoutChartInstance.destroy();
 
-  if (chart) chart.destroy();
-
-  // ตรวจสอบ Dark Mode เพื่อเปลี่ยนสีกราฟ
-  const isDark = document.documentElement.classList.contains('dark');
-  const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
-  const tickColor = isDark ? '#94a3b8' : '#64748b'; // slate-400 vs slate-500
-
-  chart = new Chart(document.getElementById("workoutChart"), {
-    type: "line",
+  workoutChartInstance = new Chart(ctx, {
+    type: "bar",
     data: {
-      labels,
+      labels: labels.length ? labels : ["No Data"],
       datasets: [{
-        data,
-        borderColor: "#007BFF",
-        backgroundColor: "rgba(0,123,255,0.15)",
-        fill: true,
-        tension: 0.4,
-        pointRadius: 4
+        label: "Minutes",
+        data: data.length ? data : [0],
+        backgroundColor: "#007BFF",
+        borderRadius: 4,
+        barThickness: 12
       }]
     },
     options: {
+      maintainAspectRatio: false,
       plugins: { legend: { display: false } },
       scales: {
         y: {
             beginAtZero: true,
             grid: { color: gridColor },
-            ticks: { color: tickColor }
+            ticks: { color: tickColor, font: {size: 10} }
         },
         x: {
-            grid: { color: gridColor },
-            ticks: { color: tickColor }
+            grid: { display: false },
+            ticks: { color: tickColor, font: {size: 10} }
         }
       }
     }
   });
 }
 
-/* ---------- TOGGLE LOGIC (FIXED & DARK MODE) ---------- */
+/* ---------- WEIGHT CHART (MOCKUP LOGIC) ---------- */
+// เนื่องจากระบบยังไม่ได้เก็บประวัติน้ำหนักจริงจัง จึงสร้างข้อมูลจำลองเพื่อให้เห็นภาพกราฟ
+function getWeightHistory() {
+    // ลองดึงจาก localStorage ถ้ามี (เผื่ออนาคต)
+    let history = JSON.parse(localStorage.getItem("weightHistory"));
+
+    // ถ้าไม่มีข้อมูล ให้สร้าง Mock Data ขึ้นมาโดยอิงจากน้ำหนักปัจจุบัน
+    if (!history || history.length === 0) {
+        const current = parseFloat(userCurrentWeight) || 70;
+        const goal = parseFloat(userGoal) || 65;
+        // สร้างจุดข้อมูลย้อนหลัง 5 สัปดาห์
+        history = [
+            { date: "4 weeks ago", weight: current + 2.5 },
+            { date: "3 weeks ago", weight: current + 1.8 },
+            { date: "2 weeks ago", weight: current + 0.9 },
+            { date: "Last week", weight: current + 0.4 },
+            { date: "Today", weight: current }
+        ];
+    }
+    return history;
+}
+
+function renderWeightChart() {
+  const dataPoints = getWeightHistory();
+  const labels = dataPoints.map(d => d.date);
+  const data = dataPoints.map(d => d.weight);
+
+  // เส้น Goal (เป็นเส้นตรงเท่ากันทุกจุด)
+  const goalData = new Array(data.length).fill(userGoal || 65);
+
+  const ctx = document.getElementById("weightChart").getContext('2d');
+  if (weightChartInstance) weightChartInstance.destroy();
+
+  weightChartInstance = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: labels,
+      datasets: [
+        {
+            label: "Weight",
+            data: data,
+            borderColor: "#FF8C00", // สีส้มตามธีม
+            backgroundColor: "rgba(255, 140, 0, 0.1)",
+            fill: true,
+            tension: 0.4,
+            pointRadius: 4,
+            pointBackgroundColor: "#fff",
+            pointBorderColor: "#FF8C00",
+            pointBorderWidth: 2
+        },
+        {
+            label: "Goal",
+            data: goalData,
+            borderColor: "#10B981", // สีเขียว
+            borderDash: [5, 5],
+            pointRadius: 0,
+            borderWidth: 1,
+            fill: false
+        }
+      ]
+    },
+    options: {
+      maintainAspectRatio: false,
+      plugins: {
+          legend: {
+              display: true,
+              labels: { color: tickColor, boxWidth: 10, font: {size: 10} }
+          }
+      },
+      scales: {
+        y: {
+            grid: { color: gridColor },
+            ticks: { color: tickColor, font: {size: 10} }
+        },
+        x: {
+            grid: { display: false },
+            ticks: { color: tickColor, font: {size: 10} }
+        }
+      }
+    }
+  });
+}
+
+/* ---------- TOGGLE LOGIC ---------- */
 function setMode(mode, clickedBtn) {
   const buttons = document.querySelectorAll("#toggleContainer button");
-
-  // อัปเดตคลาสให้รองรับ Dark Mode
-  // Inactive: พื้นใส, ตัวหนังสือเทา (เข้มขึ้นเมื่อ hover)
-  const inactiveClasses = ["bg-transparent", "text-slate-500", "dark:text-slate-400", "font-medium", "hover:text-slate-700", "dark:hover:text-slate-200"];
-
-  // Active: พื้นขาว(หรือเทาเข้ม), ตัวหนังสือสีฟ้า(หรือขาว), ตัวหนา, มีเงา
-  const activeClasses = ["bg-white", "dark:bg-slate-600", "text-brand-blue", "dark:text-white", "font-bold", "shadow-sm"];
+  const inactiveClasses = ["bg-transparent", "text-slate-500", "dark:text-slate-400"];
+  const activeClasses = ["bg-white", "dark:bg-slate-600", "text-brand-blue", "dark:text-white", "shadow-sm"];
 
   buttons.forEach(btn => {
     btn.classList.remove(...activeClasses);
     btn.classList.add(...inactiveClasses);
+    // ลบ font-bold ออกจาก inactive
+    btn.classList.remove("font-bold");
+    btn.classList.add("font-medium");
   });
 
   clickedBtn.classList.remove(...inactiveClasses);
   clickedBtn.classList.add(...activeClasses);
+  clickedBtn.classList.remove("font-medium");
+  clickedBtn.classList.add("font-bold");
 
-  renderChart(mode);
+  renderWorkoutChart(mode);
 }
 
 /* ---------- INIT ---------- */
-renderChart("daily");
+// เรียกแสดงผลกราฟทั้งสอง
+renderWorkoutChart("daily");
+renderWeightChart();
+
 </script>
 
 </div>

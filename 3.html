@@ -28,7 +28,12 @@
         } catch(e) {}
     })();
 </script>
-<style> body { font-family: 'Lexend', sans-serif; } </style>
+<style>
+    body { font-family: 'Lexend', sans-serif; }
+    .feedback-good { color: #00FF00; text-shadow: 0 0 10px rgba(0,255,0,0.5); }
+    .feedback-bad { color: #FF0000; text-shadow: 0 0 10px rgba(255,0,0,0.5); }
+    .feedback-neutral { color: #FFFFFF; }
+</style>
 </head>
 <body class="bg-bg-light dark:bg-slate-900 text-primary-blue dark:text-white font-display flex justify-center min-h-screen">
 <div class="relative w-full max-w-[430px] h-screen flex flex-col overflow-hidden bg-white dark:bg-slate-900">
@@ -61,13 +66,18 @@
                 You
             </div>
 
-            <div class="absolute top-2 right-2 bg-black/70 backdrop-blur-md rounded-lg p-2.5 border border-white/10 z-20 shadow-lg text-right min-w-[140px]">
-                <div class="text-[10px] font-bold text-[#00FF00] tracking-wider mb-1 border-b border-white/10 pb-1">MODEL: YOLOv8-Pose</div>
-                <div class="text-[10px] text-gray-300 font-mono flex justify-between"><span>mAP@0.5:</span> <span class="text-white font-bold">92.5%</span></div>
-                <div class="text-[10px] text-gray-300 font-mono flex justify-between"><span>FPS:</span> <span id="fpsDisplay" class="text-yellow-400 font-bold">0.0</span></div>
-                <div class="text-[10px] text-gray-300 font-mono flex justify-between mt-1 pt-1 border-t border-white/10">
-                    <span>Accuracy:</span>
-                    <span id="scoreDisplay" class="text-white font-bold">0%</span>
+            <div class="absolute top-2 right-2 bg-black/80 backdrop-blur-md rounded-xl p-3 border border-white/10 z-20 shadow-lg text-right min-w-[150px]">
+                <div class="text-[9px] font-bold text-[#00FF00] tracking-wider mb-1 border-b border-white/10 pb-1 opacity-80">MODEL: YOLOv8-Pose</div>
+                <div class="text-[9px] text-gray-400 font-mono flex justify-between"><span>mAP:</span> <span class="text-white">92.5%</span></div>
+                <div class="text-[9px] text-gray-400 font-mono flex justify-between"><span>FPS:</span> <span id="fpsDisplay" class="text-yellow-400">0.0</span></div>
+
+                <div class="flex justify-between items-end mt-2 mb-1">
+                    <span class="text-[10px] text-gray-300">Accuracy</span>
+                    <span id="scoreDisplay" class="text-xl font-black text-white">0%</span>
+                </div>
+
+                <div id="feedbackContainer" class="mt-1 pt-1 border-t border-white/20 text-center">
+                    <span id="feedbackText" class="text-xs font-bold feedback-neutral uppercase tracking-wider">READY</span>
                 </div>
             </div>
         </div>
@@ -117,6 +127,8 @@
             this.reps = 0; this.state = "UP"; this.accumulatedTime = 0; this.holdStartTime = null;
             this.bdState = "DOWN"; this.baselineArmY = null; this.baselineLegY = null; this.prevLandmarks = null;
             this.currentScore = 0;
+            this.feedbackMessage = "READY"; // เก็บข้อความแนะนำ
+            this.feedbackStatus = "neutral"; // good, bad, neutral
         }
         smooth(landmarks) {
             if (!this.prevLandmarks) { this.prevLandmarks = landmarks; return landmarks; }
@@ -133,35 +145,48 @@
             const hipAngle = calculateAngle(p.knee, p.hip, p.shoulder);
             const elbowAngle = calculateAngle(p.shoulder, p.elbow, p.wrist);
 
-            let percentage = 0; // คะแนนความถูกต้อง (0-100%)
+            let percentage = 0;
 
+            // --- Logic การสร้าง Feedback Text ---
             if (this.exerciseId.includes("plank")) {
                 let diff = Math.abs(180 - hipAngle);
                 percentage = Math.max(0, 100 - (diff * 2));
 
                 if (hipAngle >= 160) {
                     color = "#00FF00";
+                    this.feedbackMessage = "HOLD IT!";
+                    this.feedbackStatus = "good";
                     if (!this.holdStartTime) this.holdStartTime = Date.now();
                 } else {
+                    color = "#FF0000";
+                    // แนะนำตามอาการ
+                    this.feedbackMessage = hipAngle < 160 ? "LIFT HIPS" : "LOWER HIPS";
+                    this.feedbackStatus = "bad";
                     if (this.holdStartTime) { this.accumulatedTime += (Date.now() - this.holdStartTime)/1000; this.holdStartTime = null; }
                 }
                 let cur = this.accumulatedTime; if (this.holdStartTime) cur += (Date.now() - this.holdStartTime)/1000;
                 this.reps = Math.floor(cur); this.debugAngle = Math.round(hipAngle); this.debugPoint = p.hip;
 
             } else if (this.exerciseId.includes("bird_dog")) {
+                // Bird Dog Logic (Simplified)
                 const ly = p.l_wrist.y*canvasHeight, ry = p.r_wrist.y*canvasHeight, la = p.l_ankle.y*canvasHeight, ra = p.r_ankle.y*canvasHeight;
                 if (this.baselineArmY === null) { this.baselineArmY = (ly+ry)/2; this.baselineLegY = (la+ra)/2; }
                 const armR = (this.baselineArmY - ry) > 10, armL = (this.baselineArmY - ly) > 10, legR = (this.baselineLegY - ra) > 10, legL = (this.baselineLegY - la) > 10;
 
                 if ((armR && legL) || (armL && legR)) {
                     color = "#00FF00"; percentage = 100;
+                    this.feedbackMessage = "GOOD BALANCE";
+                    this.feedbackStatus = "good";
                     if (this.bdState === "DOWN") this.bdState = "UP";
                 } else {
                     percentage = 0;
+                    this.feedbackMessage = "LIFT ARM & LEG";
+                    this.feedbackStatus = "neutral";
                     if (this.bdState === "UP") { this.reps++; this.bdState = "DOWN"; this.baselineArmY = (ly+ry)/2; this.baselineLegY = (la+ra)/2; }
                 }
 
             } else {
+                // Squat, Pushup
                 let angle = kneeAngle, point = p.knee, down = 135, start = 170;
                 if (this.exerciseId.includes("pushup")) { angle = elbowAngle; point = p.elbow; down = 100; }
 
@@ -170,14 +195,35 @@
                 percentage = (current / range) * 100;
                 percentage = Math.min(100, Math.max(0, percentage));
 
-                if (angle <= down + 10) color = "#00FF00";
+                if (angle <= down + 10) {
+                    color = "#00FF00";
+                    this.feedbackMessage = "เยี่ยมมาก!";
+                    this.feedbackStatus = "good";
+                } else {
+                    if(this.state === "DOWN") {
+                        // ถ้ากำลังลง แต่ยังไม่ถึงจุด
+                        this.feedbackMessage = "ย่อลงอีก";
+                        this.feedbackStatus = "bad";
+                    } else {
+                        // ตอนยืน/เตรียม
+                        this.feedbackMessage = "ยืนตรง";
+                        this.feedbackStatus = "neutral";
+                    }
+                }
+
                 if (angle <= down && this.state === "UP") this.state = "DOWN";
                 if (angle >= 160 && this.state === "DOWN") { this.reps++; this.state = "UP"; }
                 this.debugAngle = Math.round(angle); this.debugPoint = point;
             }
 
             this.currentScore = percentage;
-            return { landmarks, color, rep: this.reps, debug: {val: this.debugAngle, pt: this.debugPoint}, score: this.currentScore };
+            return {
+                landmarks, color, rep: this.reps,
+                debug: {val: this.debugAngle, pt: this.debugPoint},
+                score: this.currentScore,
+                msg: this.feedbackMessage,
+                status: this.feedbackStatus
+            };
         }
     }
 
@@ -221,7 +267,8 @@
     let lastFrameTime = performance.now();
     let fps = 0;
     const fpsDisplay = document.getElementById("fpsDisplay");
-    const scoreDisplay = document.getElementById("scoreDisplay"); // อ้างอิงตัวแสดง Score
+    const scoreDisplay = document.getElementById("scoreDisplay");
+    const feedbackText = document.getElementById("feedbackText"); // อ้างอิงตัวแสดง Feedback Text
     // -------------------------------
 
     pose.onResults(res => {
@@ -253,17 +300,23 @@
             // Draw Angle
             if(result.debug && result.debug.val) drawAngleText(ctx, result.debug.val+"°", result.debug.pt.x, result.debug.pt.y);
 
-            // --- UPDATE SCORE DISPLAY ---
+            // --- UPDATE SCORE & FEEDBACK ---
             if(scoreDisplay) {
                 let s = Math.round(result.score);
                 scoreDisplay.innerText = s + "%";
-
-                // เปลี่ยนสีตามเกณฑ์
-                if(s >= 80) scoreDisplay.className = "text-[#00FF00] font-bold"; // เขียว
-                else if(s >= 50) scoreDisplay.className = "text-yellow-400 font-bold"; // เหลือง
-                else scoreDisplay.className = "text-red-500 font-bold"; // แดง
+                if(s >= 80) scoreDisplay.className = "text-xl font-black text-[#00FF00]";
+                else if(s >= 50) scoreDisplay.className = "text-xl font-black text-yellow-400";
+                else scoreDisplay.className = "text-xl font-black text-red-500";
             }
-            // ----------------------------
+
+            if(feedbackText) {
+                feedbackText.innerText = result.msg;
+                // เปลี่ยนสีข้อความตามสถานะ
+                feedbackText.className = "text-xs font-bold uppercase tracking-wider transition-colors duration-200 " +
+                    (result.status === "good" ? "feedback-good" :
+                     result.status === "bad" ? "feedback-bad" : "feedback-neutral");
+            }
+            // -------------------------------
 
             // Update Logic
             if (result.rep !== reps) {
