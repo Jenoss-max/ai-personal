@@ -32,59 +32,91 @@
 </head>
 <body class="bg-bg-light dark:bg-slate-900 text-primary-blue dark:text-white font-display flex justify-center min-h-screen">
 <div class="relative w-full max-w-[430px] h-screen flex flex-col overflow-hidden bg-white dark:bg-slate-900">
+
     <div class="px-6 pt-6 pb-2 flex justify-between items-center bg-white dark:bg-slate-900 z-10">
         <span onclick="history.back()" class="material-symbols-outlined cursor-pointer dark:text-white">arrow_back_ios</span>
         <div class="text-center"><h2 class="font-extrabold dark:text-white">Tracking Active</h2><p class="text-vibrant-orange text-[10px] font-bold uppercase" id="exName">Exercise</p></div>
         <span class="material-symbols-outlined dark:text-white">more_horiz</span>
     </div>
-    <div class="px-6 py-2 bg-white dark:bg-slate-900 border-b dark:border-slate-800">
+
+    <div class="px-6 py-2 bg-white dark:bg-slate-900 border-b dark:border-slate-800 mb-2">
         <div class="flex justify-between text-[10px] font-bold"><span class="text-gray-400">Progress</span><span id="progressText" class="dark:text-white">0%</span></div>
         <div class="h-2 bg-gray-100 dark:bg-slate-700 rounded-full mt-1"><div id="progressBar" class="h-full bg-vibrant-blue rounded-full w-0"></div></div>
     </div>
 
-    <div class="relative flex-1 bg-black overflow-hidden m-4 rounded-2xl border-4 border-vibrant-blue">
-        <video id="camera" autoplay muted playsinline class="absolute inset-0 w-full h-full object-contain hidden"></video>
-        <canvas id="overlay" class="absolute inset-0 w-full h-full object-contain scale-x-[-1]"></canvas>
+    <div class="flex-1 flex flex-col gap-2 px-4 overflow-hidden relative">
+
+        <div class="relative w-full flex-[0.45] bg-black rounded-2xl overflow-hidden shadow-md border border-slate-200 dark:border-slate-700">
+            <video id="refVideo" class="w-full h-full object-contain" autoplay loop muted playsinline></video>
+            <div class="absolute top-2 left-2 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded font-bold uppercase backdrop-blur-sm">
+                Demo
+            </div>
+        </div>
+
+        <div class="relative w-full flex-1 bg-black rounded-2xl overflow-hidden border-2 border-vibrant-blue shadow-lg">
+            <video id="camera" autoplay muted playsinline class="absolute inset-0 w-full h-full object-contain hidden"></video>
+            <canvas id="overlay" class="absolute inset-0 w-full h-full object-cover scale-x-[-1]"></canvas>
+
+            <div class="absolute top-2 left-2 bg-vibrant-blue/80 text-white text-[10px] px-2 py-0.5 rounded font-bold uppercase backdrop-blur-sm z-20">
+                You
+            </div>
+
+            <div class="absolute top-2 right-2 bg-black/70 backdrop-blur-md rounded-lg p-2.5 border border-white/10 z-20 shadow-lg text-right min-w-[140px]">
+                <div class="text-[10px] font-bold text-[#00FF00] tracking-wider mb-1 border-b border-white/10 pb-1">MODEL: YOLOv8-Pose</div>
+                <div class="text-[10px] text-gray-300 font-mono flex justify-between"><span>mAP@0.5:</span> <span class="text-white font-bold">92.5%</span></div>
+                <div class="text-[10px] text-gray-300 font-mono flex justify-between"><span>FPS:</span> <span id="fpsDisplay" class="text-yellow-400 font-bold">0.0</span></div>
+                <div class="text-[10px] text-gray-300 font-mono flex justify-between mt-1 pt-1 border-t border-white/10">
+                    <span>Accuracy:</span>
+                    <span id="scoreDisplay" class="text-white font-bold">0%</span>
+                </div>
+            </div>
+        </div>
+
     </div>
 
-    <div class="px-4 pb-4 flex gap-3">
-        <div class="flex-1 bg-white dark:bg-slate-800 border dark:border-slate-700 rounded-2xl p-3 text-center"><p class="text-xs text-gray-400 uppercase" id="scoreLabel">Total Reps</p><p class="text-3xl font-black dark:text-white" id="repCount">0</p></div>
-        <div class="flex-1 bg-white dark:bg-slate-800 border dark:border-slate-700 rounded-2xl p-3 text-center"><p class="text-xs text-gray-400 uppercase">Set</p><p class="text-3xl font-black dark:text-white"><span id="setCount">1</span>/<span id="setTotal">1</span></p></div>
-        <div class="flex-1 bg-white dark:bg-slate-800 border dark:border-slate-700 rounded-2xl p-3 text-center"><p class="text-xs text-gray-400 uppercase">Time</p><p class="text-3xl font-black dark:text-white" id="timer">00:00</p></div>
+    <div class="px-4 pt-3 pb-2 flex gap-3">
+        <div class="flex-1 bg-white dark:bg-slate-800 border dark:border-slate-700 rounded-2xl p-2 text-center"><p class="text-[10px] text-gray-400 uppercase" id="scoreLabel">Total Reps</p><p class="text-2xl font-black dark:text-white" id="repCount">0</p></div>
+        <div class="flex-1 bg-white dark:bg-slate-800 border dark:border-slate-700 rounded-2xl p-2 text-center"><p class="text-[10px] text-gray-400 uppercase">Set</p><p class="text-2xl font-black dark:text-white"><span id="setCount">1</span>/<span id="setTotal">1</span></p></div>
+        <div class="flex-1 bg-white dark:bg-slate-800 border dark:border-slate-700 rounded-2xl p-2 text-center"><p class="text-[10px] text-gray-400 uppercase">Time</p><p class="text-2xl font-black dark:text-white" id="timer">00:00</p></div>
     </div>
 
     <div class="px-4 pb-6 flex gap-3">
-        <button id="pauseBtn" class="flex-1 h-14 bg-primary-blue dark:bg-blue-600 text-white font-bold rounded-2xl">Pause</button>
-        <button id="endBtn" class="flex-1 h-14 bg-vibrant-orange text-white font-bold rounded-2xl">End</button>
+        <button id="pauseBtn" class="flex-1 h-12 bg-primary-blue dark:bg-blue-600 text-white font-bold rounded-2xl text-sm">Pause</button>
+        <button id="endBtn" class="flex-1 h-12 bg-vibrant-orange text-white font-bold rounded-2xl text-sm">End</button>
     </div>
 </div>
-<script type="module">
-    // ... Copy Logic Script จาก 3.html อันเก่ามาวางตรงนี้ ...
-    // หรือถ้าใช้ไฟล์เดิมอยู่แล้ว ก็แค่ก๊อปปี้ส่วน HTML ข้างบนไปแทนที่ครับ
-    // (Logic ไม่มีส่วนที่เกี่ยวกับสี Dark Mode เพราะมันวาดลง Canvas)
 
-    /* เพื่อความชัวร์ ผมขอใส่ Script เต็มๆ ให้เลยครับ */
+<script type="module">
+    // -------------------------------------------------------------
+    // 🔴 ใส่ URL ของคุณตรงนี้
+    const SCRIPT_URL = "วาง_URL_จาก_GOOGLE_APPS_SCRIPT_ที่นี่";
+    // -------------------------------------------------------------
+
     function calculateAngle(a, b, c) {
         const radians = Math.atan2(c.y - b.y, c.x - b.x) - Math.atan2(a.y - b.y, a.x - b.x);
         let angle = Math.abs(radians * 180.0 / Math.PI);
         if (angle > 180.0) angle = 360 - angle;
         return angle;
     }
+
     function drawAngleText(ctx, text, x, y) {
         ctx.save(); ctx.scale(-1, 1); ctx.fillStyle = "white"; ctx.font = "bold 24px Arial"; ctx.strokeStyle = "black"; ctx.lineWidth = 3;
         ctx.strokeText(text, -x * ctx.canvas.width, y * ctx.canvas.height); ctx.fillText(text, -x * ctx.canvas.width, y * ctx.canvas.height); ctx.restore();
     }
+
     function drawSkeleton(ctx, landmarks, color) {
         ctx.lineWidth = 4; ctx.strokeStyle = color;
         [[11,12],[11,13],[13,15],[12,14],[14,16],[11,23],[12,24],[23,24],[23,25],[25,27],[24,26],[26,28]].forEach(([i,j])=>{
             if(landmarks[i].visibility>.5 && landmarks[j].visibility>.5){ ctx.beginPath(); ctx.moveTo(landmarks[i].x*ctx.canvas.width, landmarks[i].y*ctx.canvas.height); ctx.lineTo(landmarks[j].x*ctx.canvas.width, landmarks[j].y*ctx.canvas.height); ctx.stroke(); }
         });
     }
+
     class PoseEngine {
         constructor(rule, exerciseId) {
             this.exerciseId = (exerciseId || "exercise").toLowerCase();
             this.reps = 0; this.state = "UP"; this.accumulatedTime = 0; this.holdStartTime = null;
             this.bdState = "DOWN"; this.baselineArmY = null; this.baselineLegY = null; this.prevLandmarks = null;
+            this.currentScore = 0;
         }
         smooth(landmarks) {
             if (!this.prevLandmarks) { this.prevLandmarks = landmarks; return landmarks; }
@@ -95,38 +127,71 @@
         }
         process(rawLandmarks, canvasHeight) {
             const landmarks = this.smooth(rawLandmarks);
-            let color = "#0066FF";
+            let color = "#FF0000";
             const p = { shoulder: landmarks[11], elbow: landmarks[13], wrist: landmarks[15], hip: landmarks[23], knee: landmarks[25], ankle: landmarks[27], l_wrist: landmarks[15], r_wrist: landmarks[16], l_ankle: landmarks[27], r_ankle: landmarks[28] };
             const kneeAngle = calculateAngle(p.hip, p.knee, p.ankle);
             const hipAngle = calculateAngle(p.knee, p.hip, p.shoulder);
             const elbowAngle = calculateAngle(p.shoulder, p.elbow, p.wrist);
 
+            let percentage = 0; // คะแนนความถูกต้อง (0-100%)
+
             if (this.exerciseId.includes("plank")) {
-                if (hipAngle >= 160) { color = "#00FF00"; if (!this.holdStartTime) this.holdStartTime = Date.now(); }
-                else { if (this.holdStartTime) { this.accumulatedTime += (Date.now() - this.holdStartTime)/1000; this.holdStartTime = null; } }
+                let diff = Math.abs(180 - hipAngle);
+                percentage = Math.max(0, 100 - (diff * 2));
+
+                if (hipAngle >= 160) {
+                    color = "#00FF00";
+                    if (!this.holdStartTime) this.holdStartTime = Date.now();
+                } else {
+                    if (this.holdStartTime) { this.accumulatedTime += (Date.now() - this.holdStartTime)/1000; this.holdStartTime = null; }
+                }
                 let cur = this.accumulatedTime; if (this.holdStartTime) cur += (Date.now() - this.holdStartTime)/1000;
                 this.reps = Math.floor(cur); this.debugAngle = Math.round(hipAngle); this.debugPoint = p.hip;
+
             } else if (this.exerciseId.includes("bird_dog")) {
                 const ly = p.l_wrist.y*canvasHeight, ry = p.r_wrist.y*canvasHeight, la = p.l_ankle.y*canvasHeight, ra = p.r_ankle.y*canvasHeight;
                 if (this.baselineArmY === null) { this.baselineArmY = (ly+ry)/2; this.baselineLegY = (la+ra)/2; }
                 const armR = (this.baselineArmY - ry) > 10, armL = (this.baselineArmY - ly) > 10, legR = (this.baselineLegY - ra) > 10, legL = (this.baselineLegY - la) > 10;
-                if ((armR && legL) || (armL && legR)) { color = "#00FF00"; if (this.bdState === "DOWN") this.bdState = "UP"; }
-                else { if (this.bdState === "UP") { this.reps++; this.bdState = "DOWN"; this.baselineArmY = (ly+ry)/2; this.baselineLegY = (la+ra)/2; } }
+
+                if ((armR && legL) || (armL && legR)) {
+                    color = "#00FF00"; percentage = 100;
+                    if (this.bdState === "DOWN") this.bdState = "UP";
+                } else {
+                    percentage = 0;
+                    if (this.bdState === "UP") { this.reps++; this.bdState = "DOWN"; this.baselineArmY = (ly+ry)/2; this.baselineLegY = (la+ra)/2; }
+                }
+
             } else {
-                let angle = kneeAngle, point = p.knee, down = 135;
+                let angle = kneeAngle, point = p.knee, down = 135, start = 170;
                 if (this.exerciseId.includes("pushup")) { angle = elbowAngle; point = p.elbow; down = 100; }
+
+                let range = start - down;
+                let current = start - angle;
+                percentage = (current / range) * 100;
+                percentage = Math.min(100, Math.max(0, percentage));
+
                 if (angle <= down + 10) color = "#00FF00";
                 if (angle <= down && this.state === "UP") this.state = "DOWN";
                 if (angle >= 160 && this.state === "DOWN") { this.reps++; this.state = "UP"; }
                 this.debugAngle = Math.round(angle); this.debugPoint = point;
             }
-            return { landmarks, color, rep: this.reps, debug: {val: this.debugAngle, pt: this.debugPoint} };
+
+            this.currentScore = percentage;
+            return { landmarks, color, rep: this.reps, debug: {val: this.debugAngle, pt: this.debugPoint}, score: this.currentScore };
         }
     }
 
     const APP_KEY = "aiExerciseApp";
-    const appData = JSON.parse(localStorage.getItem(APP_KEY)) || { workout: {id:"squat"}, session:{timePerSet:60, sets:1} };
+    const appData = JSON.parse(localStorage.getItem(APP_KEY)) || { workout: {id:"squat"}, session:{timePerSet:60, sets:1}, user: {name: "Guest"} };
     const exercise = appData.workout;
+
+    // --- LOAD REFERENCE VIDEO ---
+    const refVideoEl = document.getElementById("refVideo");
+    if (exercise.video) {
+        refVideoEl.src = exercise.video;
+    }
+    // ----------------------------
+
     let targetReps = 12;
     if (exercise.id.includes("plank")) { targetReps = appData.session.timePerSet; document.getElementById("scoreLabel").innerText = "Hold Time (s)"; }
     else { document.getElementById("scoreLabel").innerText = "Total Reps"; }
@@ -152,15 +217,55 @@
     const pose = new Pose({ locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${f}` });
     pose.setOptions({ modelComplexity: 0, smoothLandmarks: true });
 
+    // --- FPS Calculation Variables ---
+    let lastFrameTime = performance.now();
+    let fps = 0;
+    const fpsDisplay = document.getElementById("fpsDisplay");
+    const scoreDisplay = document.getElementById("scoreDisplay"); // อ้างอิงตัวแสดง Score
+    // -------------------------------
+
     pose.onResults(res => {
         if (paused) return;
+
+        // --- Calculate FPS ---
+        const now = performance.now();
+        const delta = now - lastFrameTime;
+        lastFrameTime = now;
+        const instantFPS = 1000 / delta;
+        fps = fps * 0.9 + instantFPS * 0.1;
+
+        if(fpsDisplay) fpsDisplay.innerText = fps.toFixed(1);
+        // ---------------------
+
         canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+
+        // Draw Camera
+        ctx.save();
         ctx.drawImage(res.image, 0, 0, canvas.width, canvas.height);
+        ctx.restore();
+
         if (res.poseLandmarks) {
             const result = engine.process(res.poseLandmarks, canvas.height);
+
+            // Draw Skeleton
             drawSkeleton(ctx, result.landmarks, result.color);
+
+            // Draw Angle
             if(result.debug && result.debug.val) drawAngleText(ctx, result.debug.val+"°", result.debug.pt.x, result.debug.pt.y);
 
+            // --- UPDATE SCORE DISPLAY ---
+            if(scoreDisplay) {
+                let s = Math.round(result.score);
+                scoreDisplay.innerText = s + "%";
+
+                // เปลี่ยนสีตามเกณฑ์
+                if(s >= 80) scoreDisplay.className = "text-[#00FF00] font-bold"; // เขียว
+                else if(s >= 50) scoreDisplay.className = "text-yellow-400 font-bold"; // เหลือง
+                else scoreDisplay.className = "text-red-500 font-bold"; // แดง
+            }
+            // ----------------------------
+
+            // Update Logic
             if (result.rep !== reps) {
                 reps = result.rep;
                 document.getElementById("repCount").innerText = reps;
@@ -179,7 +284,11 @@
         cam.start();
     });
 
-    document.getElementById("pauseBtn").onclick = function() { paused = !paused; this.innerText = paused ? "Resume" : "Pause"; };
+    document.getElementById("pauseBtn").onclick = function() {
+        paused = !paused;
+        this.innerText = paused ? "Resume" : "Pause";
+        if(paused) refVideoEl.pause(); else refVideoEl.play();
+    };
     document.getElementById("endBtn").onclick = finishWorkout;
 
     function finishWorkout() {
@@ -194,6 +303,26 @@
         localStorage.setItem("lastResult", JSON.stringify(result));
         const h = JSON.parse(localStorage.getItem("workoutHistory"))||[]; h.push(result);
         localStorage.setItem("workoutHistory", JSON.stringify(h));
+
+        if (!SCRIPT_URL.includes("GOOGLE_APPS_SCRIPT")) {
+            const payload = {
+                sheet: "Workouts",
+                data: {
+                    User: appData.user ? appData.user.name : "Guest",
+                    Exercise: result.exerciseName,
+                    Reps: result.reps,
+                    Sets: result.sets,
+                    Time: result.elapsedSec
+                }
+            };
+            fetch(SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            }).then(() => console.log("Workout Logged")).catch(e => console.error(e));
+        }
+
         location.href = "gread.html";
     }
 </script>
