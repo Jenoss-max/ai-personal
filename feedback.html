@@ -36,7 +36,6 @@
 
 <style>
     body { font-family: 'Lexend', sans-serif; }
-    /* ป้องกันไอคอนล้นด้วยการกำหนดขนาด Font */
     .material-symbols-outlined {
         font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         font-size: 24px !important;
@@ -62,7 +61,6 @@
         </div>
 
         <div class="flex flex-col gap-3">
-
             <button class="rating-btn w-full p-3 rounded-2xl border-2 flex items-center gap-4 transition-all duration-200 group bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-primary/50" data-level="1">
                 <div class="w-12 h-12 min-w-[3rem] rounded-xl flex items-center justify-center bg-white dark:bg-slate-700 shadow-sm transition-colors overflow-hidden shrink-0">
                     <span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">😌</span>
@@ -127,7 +125,6 @@
                     <div class="w-3 h-3 rounded-full bg-primary opacity-0 transition-opacity"></div>
                 </div>
             </button>
-
         </div>
 
         <div class="mt-8">
@@ -146,61 +143,52 @@
 </div>
 
 <script>
+// -------------------------------------------------------------
+// 🔴🔴🔴 วาง URL ที่คัดลอกมาจาก Apps Script ตรงนี้ 🔴🔴🔴
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx8K0Ys4MhW2CurS2ic9URANtxA4uCSTE-owwGaEP1hxK7ar8l9JF9ey6R3XrAx7Pz5/exec";
+// -------------------------------------------------------------
+
 let tirednessLevel = 5; // Default Max
 const btns = document.querySelectorAll(".rating-btn");
 
 function updateUI() {
     btns.forEach((btn, index) => {
         const level = index + 1;
-
-        // Elements
-        const box = btn.querySelector("div"); // Icon Box
+        const box = btn.querySelector("div");
         const icon = btn.querySelector(".material-symbols-outlined");
         const title = btn.querySelector("p.font-bold");
         const radioInner = btn.querySelector(".radio-circle div");
         const radioOuter = btn.querySelector(".radio-circle");
 
-        // Force reset any weird class injections
         box.classList.remove("border-primary", "bg-primary/10");
         radioOuter.classList.remove("border-primary");
         radioInner.classList.remove("opacity-100");
         radioInner.classList.add("opacity-0");
 
         if (level === tirednessLevel) {
-            // Active State
             btn.classList.add("bg-primary/5", "dark:bg-primary/10", "border-primary");
             btn.classList.remove("border-slate-200", "dark:border-slate-700");
-
             box.classList.add("border-primary", "bg-primary/10");
             box.classList.remove("bg-white", "dark:bg-slate-700", "border-slate-200", "dark:border-slate-700");
-
             icon.classList.add("text-primary");
             icon.classList.remove("text-slate-400");
             icon.style.fontVariationSettings = "'FILL' 1";
-
             title.classList.add("text-primary");
             title.classList.remove("text-slate-700", "dark:text-slate-200");
-
             radioOuter.classList.add("border-primary");
             radioOuter.classList.remove("border-slate-300", "dark:border-slate-600");
-
             radioInner.classList.remove("opacity-0");
             radioInner.classList.add("opacity-100");
         } else {
-            // Inactive State
             btn.classList.remove("bg-primary/5", "dark:bg-primary/10", "border-primary");
             btn.classList.add("border-slate-200", "dark:border-slate-700");
-
             box.classList.remove("border-primary", "bg-primary/10");
             box.classList.add("bg-white", "dark:bg-slate-700", "border-slate-200", "dark:border-slate-700");
-
             icon.classList.remove("text-primary");
             icon.classList.add("text-slate-400");
             icon.style.fontVariationSettings = "'FILL' 0";
-
             title.classList.remove("text-primary");
             title.classList.add("text-slate-700", "dark:text-slate-200");
-
             radioOuter.classList.remove("border-primary");
             radioOuter.classList.add("border-slate-300", "dark:border-slate-600");
         }
@@ -213,12 +201,18 @@ btns.forEach((btn, index) => {
         updateUI();
     };
 });
-
-// Init
 updateUI();
 
 document.getElementById("submitBtn").onclick = () => {
     const note = document.querySelector("textarea").value;
+    const btn = document.getElementById("submitBtn");
+
+    // 1. UI Loading
+    btn.innerHTML = `SAVING... <span class="material-symbols-outlined animate-spin">sync</span>`;
+    btn.disabled = true;
+
+    // 2. Data Preparation
+    const appData = JSON.parse(localStorage.getItem("aiExerciseApp")) || {};
     const lastResult = JSON.parse(localStorage.getItem("lastResult")) || {};
 
     const feedbackData = {
@@ -229,12 +223,54 @@ document.getElementById("submitBtn").onclick = () => {
         timestamp: Date.now()
     };
 
+    // Save Local History
     const history = JSON.parse(localStorage.getItem("feedbackHistory")) || [];
     history.push(feedbackData);
     localStorage.setItem("feedbackHistory", JSON.stringify(history));
 
-    location.href = "5.html";
+    // Update workout history with grade/note
+    const workoutHistory = JSON.parse(localStorage.getItem("workoutHistory")) || [];
+    if(workoutHistory.length > 0) {
+        workoutHistory[workoutHistory.length - 1].grade = tirednessLevel;
+        workoutHistory[workoutHistory.length - 1].feedbackNote = note;
+        localStorage.setItem("workoutHistory", JSON.stringify(workoutHistory));
+    }
+
+    // 3. Send to Google Sheet
+    if (SCRIPT_URL && SCRIPT_URL.includes("script.google.com")) {
+        const payload = {
+            User: appData.user ? appData.user.name : "Guest",
+            Exercise: lastResult.exerciseName || "Unknown",
+            Reps: lastResult.reps || 0,
+            Sets: lastResult.sets || 0,
+            Time: lastResult.elapsedSec || 0,
+            Feedback: `RPE: ${tirednessLevel}/5 - ${note}`
+        };
+
+        fetch(SCRIPT_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        })
+        .then(() => {
+            console.log("Sent to Sheet");
+            goHome();
+        })
+        .catch(e => {
+            console.error("Error", e);
+            goHome();
+        });
+    } else {
+        goHome();
+    }
 };
+
+function goHome() {
+    setTimeout(() => {
+        location.href = "5.html";
+    }, 1000);
+}
 </script>
 
 </body>
