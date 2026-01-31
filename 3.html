@@ -98,9 +98,8 @@
 
 <script type="module">
     // -------------------------------------------------------------
-    // 🔴🔴🔴 สำคัญ: วาง URL ที่ได้จาก Google Apps Script ตรงนี้ 🔴🔴🔴
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyD4upicByVS7iM5xBPxhow-mRvsGQB1DL3Y_1QKt4sR2aYbKwlfOmEYSnt9_N7IVRt/exec";
-    // ตัวอย่าง: "https://script.google.com/macros/s/AKfycby.../exec"
+    // 🔴 ใส่ URL ของคุณตรงนี้
+    const SCRIPT_URL = "วาง_URL_จาก_GOOGLE_APPS_SCRIPT_ที่นี่";
     // -------------------------------------------------------------
 
     function calculateAngle(a, b, c) {
@@ -128,8 +127,8 @@
             this.reps = 0; this.state = "UP"; this.accumulatedTime = 0; this.holdStartTime = null;
             this.bdState = "DOWN"; this.baselineArmY = null; this.baselineLegY = null; this.prevLandmarks = null;
             this.currentScore = 0;
-            this.feedbackMessage = "READY";
-            this.feedbackStatus = "neutral";
+            this.feedbackMessage = "READY"; // เก็บข้อความแนะนำ
+            this.feedbackStatus = "neutral"; // good, bad, neutral
         }
         smooth(landmarks) {
             if (!this.prevLandmarks) { this.prevLandmarks = landmarks; return landmarks; }
@@ -148,41 +147,69 @@
 
             let percentage = 0;
 
+            // --- Logic การสร้าง Feedback Text ---
             if (this.exerciseId.includes("plank")) {
                 let diff = Math.abs(180 - hipAngle);
                 percentage = Math.max(0, 100 - (diff * 2));
+
                 if (hipAngle >= 160) {
-                    color = "#00FF00"; this.feedbackMessage = "HOLD IT!"; this.feedbackStatus = "good";
+                    color = "#00FF00";
+                    this.feedbackMessage = "HOLD IT!";
+                    this.feedbackStatus = "good";
                     if (!this.holdStartTime) this.holdStartTime = Date.now();
                 } else {
-                    color = "#FF0000"; this.feedbackMessage = hipAngle < 160 ? "LIFT HIPS" : "LOWER HIPS"; this.feedbackStatus = "bad";
+                    color = "#FF0000";
+                    // แนะนำตามอาการ
+                    this.feedbackMessage = hipAngle < 160 ? "LIFT HIPS" : "LOWER HIPS";
+                    this.feedbackStatus = "bad";
                     if (this.holdStartTime) { this.accumulatedTime += (Date.now() - this.holdStartTime)/1000; this.holdStartTime = null; }
                 }
                 let cur = this.accumulatedTime; if (this.holdStartTime) cur += (Date.now() - this.holdStartTime)/1000;
                 this.reps = Math.floor(cur); this.debugAngle = Math.round(hipAngle); this.debugPoint = p.hip;
 
             } else if (this.exerciseId.includes("bird_dog")) {
+                // Bird Dog Logic (Simplified)
                 const ly = p.l_wrist.y*canvasHeight, ry = p.r_wrist.y*canvasHeight, la = p.l_ankle.y*canvasHeight, ra = p.r_ankle.y*canvasHeight;
                 if (this.baselineArmY === null) { this.baselineArmY = (ly+ry)/2; this.baselineLegY = (la+ra)/2; }
                 const armR = (this.baselineArmY - ry) > 10, armL = (this.baselineArmY - ly) > 10, legR = (this.baselineLegY - ra) > 10, legL = (this.baselineLegY - la) > 10;
 
                 if ((armR && legL) || (armL && legR)) {
-                    color = "#00FF00"; percentage = 100; this.feedbackMessage = "GOOD BALANCE"; this.feedbackStatus = "good";
+                    color = "#00FF00"; percentage = 100;
+                    this.feedbackMessage = "GOOD BALANCE";
+                    this.feedbackStatus = "good";
                     if (this.bdState === "DOWN") this.bdState = "UP";
                 } else {
-                    percentage = 0; this.feedbackMessage = "LIFT ARM & LEG"; this.feedbackStatus = "neutral";
+                    percentage = 0;
+                    this.feedbackMessage = "LIFT ARM & LEG";
+                    this.feedbackStatus = "neutral";
                     if (this.bdState === "UP") { this.reps++; this.bdState = "DOWN"; this.baselineArmY = (ly+ry)/2; this.baselineLegY = (la+ra)/2; }
                 }
 
             } else {
+                // Squat, Pushup
                 let angle = kneeAngle, point = p.knee, down = 135, start = 170;
                 if (this.exerciseId.includes("pushup")) { angle = elbowAngle; point = p.elbow; down = 100; }
 
-                let range = start - down; let current = start - angle; percentage = (current / range) * 100;
+                let range = start - down;
+                let current = start - angle;
+                percentage = (current / range) * 100;
                 percentage = Math.min(100, Math.max(0, percentage));
 
-                if (angle <= down + 10) { color = "#00FF00"; this.feedbackMessage = "PERFECT!"; this.feedbackStatus = "good"; }
-                else { this.feedbackMessage = (this.state === "DOWN") ? "GO LOWER" : "GO DOWN"; this.feedbackStatus = (this.state === "DOWN") ? "bad" : "neutral"; }
+                if (angle <= down + 10) {
+                    color = "#00FF00";
+                    this.feedbackMessage = "เยี่ยมมาก!";
+                    this.feedbackStatus = "good";
+                } else {
+                    if(this.state === "DOWN") {
+                        // ถ้ากำลังลง แต่ยังไม่ถึงจุด
+                        this.feedbackMessage = "ย่อลงอีก";
+                        this.feedbackStatus = "bad";
+                    } else {
+                        // ตอนยืน/เตรียม
+                        this.feedbackMessage = "ยืนตรง";
+                        this.feedbackStatus = "neutral";
+                    }
+                }
 
                 if (angle <= down && this.state === "UP") this.state = "DOWN";
                 if (angle >= 160 && this.state === "DOWN") { this.reps++; this.state = "UP"; }
@@ -190,15 +217,26 @@
             }
 
             this.currentScore = percentage;
-            return { landmarks, color, rep: this.reps, debug: {val: this.debugAngle, pt: this.debugPoint}, score: this.currentScore, msg: this.feedbackMessage, status: this.feedbackStatus };
+            return {
+                landmarks, color, rep: this.reps,
+                debug: {val: this.debugAngle, pt: this.debugPoint},
+                score: this.currentScore,
+                msg: this.feedbackMessage,
+                status: this.feedbackStatus
+            };
         }
     }
 
     const APP_KEY = "aiExerciseApp";
     const appData = JSON.parse(localStorage.getItem(APP_KEY)) || { workout: {id:"squat"}, session:{timePerSet:60, sets:1}, user: {name: "Guest"} };
     const exercise = appData.workout;
+
+    // --- LOAD REFERENCE VIDEO ---
     const refVideoEl = document.getElementById("refVideo");
-    if (exercise.video) refVideoEl.src = exercise.video;
+    if (exercise.video) {
+        refVideoEl.src = exercise.video;
+    }
+    // ----------------------------
 
     let targetReps = 12;
     if (exercise.id.includes("plank")) { targetReps = appData.session.timePerSet; document.getElementById("scoreLabel").innerText = "Hold Time (s)"; }
@@ -225,36 +263,62 @@
     const pose = new Pose({ locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${f}` });
     pose.setOptions({ modelComplexity: 0, smoothLandmarks: true });
 
-    let lastFrameTime = performance.now(); let fps = 0;
+    // --- FPS Calculation Variables ---
+    let lastFrameTime = performance.now();
+    let fps = 0;
     const fpsDisplay = document.getElementById("fpsDisplay");
     const scoreDisplay = document.getElementById("scoreDisplay");
-    const feedbackText = document.getElementById("feedbackText");
+    const feedbackText = document.getElementById("feedbackText"); // อ้างอิงตัวแสดง Feedback Text
+    // -------------------------------
 
     pose.onResults(res => {
         if (paused) return;
-        const now = performance.now(); const delta = now - lastFrameTime; lastFrameTime = now;
-        fps = fps * 0.9 + (1000 / delta) * 0.1;
+
+        // --- Calculate FPS ---
+        const now = performance.now();
+        const delta = now - lastFrameTime;
+        lastFrameTime = now;
+        const instantFPS = 1000 / delta;
+        fps = fps * 0.9 + instantFPS * 0.1;
+
         if(fpsDisplay) fpsDisplay.innerText = fps.toFixed(1);
+        // ---------------------
 
         canvas.width = video.videoWidth; canvas.height = video.videoHeight;
-        ctx.save(); ctx.drawImage(res.image, 0, 0, canvas.width, canvas.height); ctx.restore();
+
+        // Draw Camera
+        ctx.save();
+        ctx.drawImage(res.image, 0, 0, canvas.width, canvas.height);
+        ctx.restore();
 
         if (res.poseLandmarks) {
             const result = engine.process(res.poseLandmarks, canvas.height);
+
+            // Draw Skeleton
             drawSkeleton(ctx, result.landmarks, result.color);
+
+            // Draw Angle
             if(result.debug && result.debug.val) drawAngleText(ctx, result.debug.val+"°", result.debug.pt.x, result.debug.pt.y);
 
+            // --- UPDATE SCORE & FEEDBACK ---
             if(scoreDisplay) {
                 let s = Math.round(result.score);
                 scoreDisplay.innerText = s + "%";
-                scoreDisplay.className = "text-xl font-black " + (s>=80 ? "text-[#00FF00]" : s>=50 ? "text-yellow-400" : "text-red-500");
-            }
-            if(feedbackText) {
-                feedbackText.innerText = result.msg;
-                feedbackText.className = "text-xs font-bold uppercase tracking-wider transition-colors duration-200 " +
-                    (result.status === "good" ? "feedback-good" : result.status === "bad" ? "feedback-bad" : "feedback-neutral");
+                if(s >= 80) scoreDisplay.className = "text-xl font-black text-[#00FF00]";
+                else if(s >= 50) scoreDisplay.className = "text-xl font-black text-yellow-400";
+                else scoreDisplay.className = "text-xl font-black text-red-500";
             }
 
+            if(feedbackText) {
+                feedbackText.innerText = result.msg;
+                // เปลี่ยนสีข้อความตามสถานะ
+                feedbackText.className = "text-xs font-bold uppercase tracking-wider transition-colors duration-200 " +
+                    (result.status === "good" ? "feedback-good" :
+                     result.status === "bad" ? "feedback-bad" : "feedback-neutral");
+            }
+            // -------------------------------
+
+            // Update Logic
             if (result.rep !== reps) {
                 reps = result.rep;
                 document.getElementById("repCount").innerText = reps;
@@ -274,7 +338,8 @@
     });
 
     document.getElementById("pauseBtn").onclick = function() {
-        paused = !paused; this.innerText = paused ? "Resume" : "Pause";
+        paused = !paused;
+        this.innerText = paused ? "Resume" : "Pause";
         if(paused) refVideoEl.pause(); else refVideoEl.play();
     };
     document.getElementById("endBtn").onclick = finishWorkout;
@@ -292,25 +357,23 @@
         const h = JSON.parse(localStorage.getItem("workoutHistory"))||[]; h.push(result);
         localStorage.setItem("workoutHistory", JSON.stringify(h));
 
-        // --- ส่วนส่งข้อมูลไป Google Sheet ---
-        if (SCRIPT_URL && SCRIPT_URL.includes("script.google.com")) {
+        if (!SCRIPT_URL.includes("GOOGLE_APPS_SCRIPT")) {
             const payload = {
-                User: appData.user ? appData.user.name : "Guest",
-                Exercise: result.exerciseName,
-                Reps: result.reps,
-                Sets: result.sets,
-                Time: result.elapsedSec
+                sheet: "Workouts",
+                data: {
+                    User: appData.user ? appData.user.name : "Guest",
+                    Exercise: result.exerciseName,
+                    Reps: result.reps,
+                    Sets: result.sets,
+                    Time: result.elapsedSec
+                }
             };
-
-            // ใช้ mode: 'no-cors' เพื่อไม่ให้ติดปัญหา Cross-Origin (แต่จะอ่านค่าตอบกลับไม่ได้ ซึ่งไม่เป็นไรสำหรับการ log)
             fetch(SCRIPT_URL, {
                 method: "POST",
                 mode: "no-cors",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
-            })
-            .then(() => console.log("Sent to Google Sheet"))
-            .catch(e => console.error("Error sending to sheet:", e));
+            }).then(() => console.log("Workout Logged")).catch(e => console.error(e));
         }
 
         location.href = "gread.html";
