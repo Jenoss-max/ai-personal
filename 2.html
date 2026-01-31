@@ -137,11 +137,14 @@
     const isEditing = urlParams.has('edit');
     const isNew = urlParams.has('new');
 
-    // ถ้ากด Create Profile มา (isNew) -> ล้างข้อมูลเก่าทิ้งเลย
+    // 🔴🔴🔴 LOGIC สำคัญตรงนี้ 🔴🔴🔴
+    // ถ้าเป็นการสร้างใหม่ (Create Profile) -> ลบทุกอย่างทิ้งให้หมดเพื่อเริ่มใหม่
     if (isNew) {
-        localStorage.removeItem(APP_KEY);
-        // localStorage.removeItem("workoutHistory"); // ถ้าต้องการล้างประวัติด้วยให้ uncomment บรรทัดนี้
-        // localStorage.removeItem("lastResult");
+        localStorage.removeItem(APP_KEY);           // ลบข้อมูลโปรไฟล์
+        localStorage.removeItem("workoutHistory");  // ลบประวัติการออกกำลังกาย
+        localStorage.removeItem("lastResult");      // ลบผลลัพธ์ล่าสุด
+        localStorage.removeItem("feedbackHistory"); // ลบประวัติฟีดแบค
+        // หรือจะใช้ localStorage.clear() เลยก็ได้ถ้าไม่มีข้อมูลแอพอื่น
     }
 
     const checkData = JSON.parse(localStorage.getItem(APP_KEY));
