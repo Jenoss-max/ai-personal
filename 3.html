@@ -22,7 +22,7 @@
                 },
                 keyframes: {
                     flashRed: {
-                        '0%, 100%': { borderColor: 'rgba(239, 68, 68, 1)' }, // Red-500
+                        '0%, 100%': { borderColor: 'rgba(239, 68, 68, 1)' },
                         '50%': { borderColor: 'rgba(239, 68, 68, 0.3)' },
                     }
                 }
@@ -81,7 +81,10 @@
             <div class="absolute top-2 left-2 bg-vibrant-blue/80 text-white text-[10px] px-2 py-0.5 rounded font-bold uppercase backdrop-blur-sm z-20">You</div>
 
             <div id="feedbackBox" class="absolute top-2 right-2 bg-black/60 backdrop-blur-md rounded-xl p-3 border border-white/10 z-20 shadow-lg text-right min-w-[140px] transition-all duration-300">
-                <div class="text-[9px] font-bold text-[#00FF00] tracking-wider mb-1 border-b border-white/20 pb-1 opacity-80">AI FEEDBACK</div>
+                <div class="flex justify-between items-center mb-1 border-b border-white/20 pb-1">
+                    <span class="text-[9px] font-bold text-[#00FF00] tracking-wider opacity-80">AI FEEDBACK</span>
+                    <span id="fpsDisplay" class="text-[9px] font-mono text-yellow-400">0 FPS</span>
+                </div>
 
                 <div class="flex justify-between items-end mb-2">
                     <span class="text-[9px] text-gray-300">Score</span>
@@ -161,7 +164,6 @@
                     if (!this.holdStartTime) this.holdStartTime = Date.now();
                 } else {
                     color = "#FF0000";
-                    // แจ้งเตือน: สะโพกสูงหรือต่ำเกินไป
                     this.feedbackMessage = hipAngle < 160 ? "LIFT HIPS" : "LOWER HIPS";
                     this.feedbackStatus = "bad";
                     if (this.holdStartTime) { this.accumulatedTime += (Date.now() - this.holdStartTime)/1000; this.holdStartTime = null; }
@@ -192,7 +194,6 @@
                 if (angle <= down + 10) {
                     color = "#00FF00"; this.feedbackMessage = "PERFECT!"; this.feedbackStatus = "good";
                 } else {
-                    // แจ้งเตือน: ลงให้ต่ำกว่านี้
                     this.feedbackMessage = (this.state === "DOWN") ? "GO LOWER" : "GO DOWN";
                     this.feedbackStatus = (this.state === "DOWN") ? "bad" : "neutral";
                 }
@@ -271,16 +272,20 @@
     pose.setOptions({ modelComplexity: 0, smoothLandmarks: true });
 
     let lastFrameTime = performance.now(); let fps = 0;
-    const fpsDisplay = document.getElementById("fpsDisplay"); // Removed ID to avoid error if missing
+    const fpsDisplay = document.getElementById("fpsDisplay");
     const scoreDisplay = document.getElementById("scoreDisplay");
     const feedbackText = document.getElementById("feedbackText");
-    const feedbackBox = document.getElementById("feedbackBox"); // กล่องข้อความ
-    const camWrapper = document.getElementById("cameraWrapper"); // กรอบกล้อง
+    const feedbackBox = document.getElementById("feedbackBox");
+    const camWrapper = document.getElementById("cameraWrapper");
 
     pose.onResults(res => {
         if (paused) return;
+
+        // --- FPS CALCULATION ---
         const now = performance.now(); const delta = now - lastFrameTime; lastFrameTime = now;
         fps = fps * 0.9 + (1000 / delta) * 0.1;
+        if(fpsDisplay) fpsDisplay.innerText = fps.toFixed(1) + " FPS";
+        // -----------------------
 
         canvas.width = video.videoWidth; canvas.height = video.videoHeight;
         ctx.save(); ctx.drawImage(res.image, 0, 0, canvas.width, canvas.height); ctx.restore();
@@ -289,7 +294,6 @@
             if (isPrep) {
                 drawSkeleton(ctx, engine.smooth(res.poseLandmarks), "#FFFFFF");
                 if(feedbackText) feedbackText.innerText = "GET READY...";
-                // รีเซ็ตสีกรอบตอนเตรียมตัว
                 if(camWrapper) { camWrapper.className = "relative w-full flex-1 bg-black rounded-2xl overflow-hidden border-4 border-vibrant-blue shadow-lg transition-colors duration-300"; }
                 if(feedbackBox) { feedbackBox.className = "absolute top-2 right-2 bg-black/60 backdrop-blur-md rounded-xl p-3 border border-white/10 z-20 shadow-lg text-right min-w-[140px] transition-all duration-300"; }
                 return;
@@ -304,33 +308,27 @@
                 scoreDisplay.innerText = s + "%";
             }
 
-            // --- VISUAL ALERT LOGIC (แจ้งเตือนด้วยสี) ---
+            // --- VISUAL ALERT LOGIC ---
             if(feedbackText) {
                 feedbackText.innerText = result.msg;
 
                 if (result.status === "bad") {
-                    // แย่: กรอบแดงกระพริบ + กล่องข้อความแดง
                     if(camWrapper) camWrapper.classList.add("border-red-500", "animate-flash-red");
                     if(camWrapper) camWrapper.classList.remove("border-vibrant-blue", "border-green-500");
-
                     if(feedbackBox) feedbackBox.className = "absolute top-2 right-2 rounded-xl p-3 border z-20 shadow-lg text-right min-w-[140px] transition-all duration-300 status-bad";
                 }
                 else if (result.status === "good") {
-                    // ดี: กรอบเขียว + กล่องข้อความเขียว
                     if(camWrapper) camWrapper.classList.add("border-green-500");
                     if(camWrapper) camWrapper.classList.remove("border-vibrant-blue", "border-red-500", "animate-flash-red");
-
                     if(feedbackBox) feedbackBox.className = "absolute top-2 right-2 rounded-xl p-3 border z-20 shadow-lg text-right min-w-[140px] transition-all duration-300 status-good";
                 }
                 else {
-                    // ปกติ: กรอบฟ้า + กล่องข้อความใส
                     if(camWrapper) camWrapper.classList.add("border-vibrant-blue");
                     if(camWrapper) camWrapper.classList.remove("border-green-500", "border-red-500", "animate-flash-red");
-
                     if(feedbackBox) feedbackBox.className = "absolute top-2 right-2 rounded-xl p-3 border z-20 shadow-lg text-right min-w-[140px] transition-all duration-300 status-neutral";
                 }
             }
-            // ----------------------------------------
+            // --------------------------
 
             if (result.rep !== reps) {
                 reps = result.rep;
@@ -369,7 +367,6 @@
         const h = JSON.parse(localStorage.getItem("workoutHistory"))||[]; h.push(result);
         localStorage.setItem("workoutHistory", JSON.stringify(h));
 
-        // 🟢 ไปหน้าสรุปผลทันที (ไม่ส่งข้อมูลที่นี่)
         location.href = "gread.html";
     }
 </script>
