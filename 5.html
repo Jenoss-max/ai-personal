@@ -33,7 +33,7 @@
         try {
             const data = JSON.parse(localStorage.getItem("aiExerciseApp"));
             if (data && data.user && data.user.darkMode) document.documentElement.classList.add("dark");
-        } catch (e) {}
+        } catch(e) {}
     })();
 </script>
 
@@ -67,8 +67,8 @@
 <span class="material-symbols-outlined text-2xl">notifications</span>
 <span class="absolute top-2.5 right-2.5 w-2 h-2 bg-brand-orange rounded-full border-2 border-white dark:border-slate-800"></span>
 </button>
-<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-brand-light dark:border-slate-700">
-<img alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCcWnBdMCYhgVqaX9fYt1xym6mAiIc_tCBp247UUoxKqJAo7UijX5gdf3kvJHtVM5REpA0w3Mztfd2RBefaCtxWB_CSDoq04foMR0K-wMeMBxYhDDZyDqaC7CaOMHUBxPtOSlDeTB2okOyJL26wBLeeU6H3y4q8_zCx0MPGMRx0XonD5p83v_c4twhaIv4kC0yInTOehozjKM3Ti_fPx-7G0i7Cd5qhU_TFWfM9TzgGyALwgUmz8vK4v6e7c2jroyuD0zkCBp4urxM"/>
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-brand-light dark:border-slate-700 bg-white dark:bg-slate-800">
+<img id="headerProfilePic" alt="Profile" class="w-full h-full object-cover" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ccc'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E"/>
 </div>
 </div>
 </header>
@@ -122,7 +122,6 @@
 <script>
 const APP_KEY = "aiExerciseApp";
 
-// 1. นำข้อมูลจาก exercises.json มาใส่ตรงนี้
 const EXERCISE_DATA = {
   "squat": {
     "label": "Squat",
@@ -176,6 +175,13 @@ if (!appData || !appData.user) {
 const welcomeEl = document.getElementById("welcomeName");
 if (welcomeEl && appData.user?.name) { welcomeEl.innerText = `Hi!  ${appData.user.name}👋`; }
 
+// ----- UPDATE PROFILE PICTURE -----
+const headerProfilePic = document.getElementById("headerProfilePic");
+if (appData.user && appData.user.profileImage) {
+    headerProfilePic.src = appData.user.profileImage;
+}
+// ---------------------------------
+
 // Stats Calculation
 const DAILY_TARGET_MIN = 60; const DAILY_TARGET_KCAL = 400;
 const history = JSON.parse(localStorage.getItem("workoutHistory")) || [];
@@ -203,7 +209,6 @@ function renderWorkoutGrid() {
   grid.innerHTML = "";
   Object.entries(EXERCISE_DATA).forEach(([id, ex]) => {
 
-    // แปลง rep type เป็นข้อความที่เข้าใจง่าย
     let repText = "12 Reps";
     if (ex.rep === "hold") repText = "30 Sec";
     else if (ex.rep === "pushup") repText = "10 Reps";
@@ -226,12 +231,11 @@ function renderWorkoutGrid() {
 
 function selectExercise(id, ex) {
   const appData = JSON.parse(localStorage.getItem(APP_KEY));
-  // Save Selected Exercise to LocalStorage
   appData.workout = {
       id: id,
       label: ex.label,
       ruleFile: `./${ex.file}`,
-      video: `./assets/videos/${ex.video}`, // Construct path
+      video: `./assets/videos/${ex.video}`,
       image: `./assets/images/${ex.image}`,
       repType: ex.rep
   };

@@ -29,7 +29,18 @@ tailwind.config = {
 
 <main class="flex-1 px-6 pt-6 pb-28 space-y-6">
   <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 border dark:border-slate-700 text-center">
-    <div class="w-20 h-20 rounded-full bg-brand-light dark:bg-slate-700 mx-auto flex items-center justify-center text-3xl font-black">👤</div>
+
+    <div class="relative w-20 h-20 mx-auto group cursor-pointer" onclick="document.getElementById('fileInput').click()">
+        <div class="w-full h-full rounded-full bg-brand-light dark:bg-slate-700 overflow-hidden border-2 border-transparent hover:border-brand-blue transition-all">
+            <img id="profileDisplay" class="w-full h-full object-cover hidden" src="" alt="Profile">
+            <div id="defaultIcon" class="w-full h-full flex items-center justify-center text-3xl font-black">👤</div>
+        </div>
+        <div class="absolute bottom-0 right-0 bg-brand-blue text-white rounded-full p-1 shadow-md">
+            <span class="material-symbols-outlined text-[12px] block">edit</span>
+        </div>
+    </div>
+    <input type="file" id="fileInput" accept="image/*" class="hidden" onchange="handleImageUpload(this)">
+
     <h2 class="mt-3 text-xl font-extrabold" id="userName">User</h2>
     <button id="editProfileBtn" class="mt-2 px-4 py-1.5 bg-brand-light dark:bg-slate-700 rounded-full text-sm font-bold">Edit Profile</button>
   </div>
@@ -75,6 +86,36 @@ document.getElementById("height").innerText = user.height ?? 0;
 document.getElementById("weight").innerText = user.weight ?? 0;
 document.getElementById("goal").innerText = user.goalWeight ?? 0;
 
+// ----- Logic แสดงรูปภาพ -----
+const profileImg = document.getElementById("profileDisplay");
+const defaultIcon = document.getElementById("defaultIcon");
+
+if (user.profileImage) {
+    profileImg.src = user.profileImage;
+    profileImg.classList.remove("hidden");
+    defaultIcon.classList.add("hidden");
+}
+
+// ----- ฟังก์ชันอัปโหลดรูปภาพ -----
+function handleImageUpload(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            // 1. แสดงผลทันที
+            profileImg.src = e.target.result;
+            profileImg.classList.remove("hidden");
+            defaultIcon.classList.add("hidden");
+
+            // 2. บันทึกลง LocalStorage
+            user.profileImage = e.target.result; // เก็บเป็น Base64 String
+            appData.user = user;
+            localStorage.setItem(APP_KEY, JSON.stringify(appData));
+        }
+        // อ่านไฟล์เป็น Data URL (Base64)
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
 document.getElementById("editProfileBtn").onclick = () => location.href = "2.html?edit=1";
 
 const darkToggle = document.getElementById("darkToggle");
@@ -89,7 +130,6 @@ darkToggle.onchange = () => {
   document.documentElement.classList.toggle("dark", user.darkMode);
 };
 
-// 🔴 LOGIC SIGN OUT: แค่กลับหน้าแรก ไม่ลบข้อมูล
 document.getElementById("signOutBtn").onclick = () => {
   window.location.href = "6.html";
 };

@@ -144,7 +144,6 @@
         localStorage.removeItem("workoutHistory");  // ลบประวัติการออกกำลังกาย
         localStorage.removeItem("lastResult");      // ลบผลลัพธ์ล่าสุด
         localStorage.removeItem("feedbackHistory"); // ลบประวัติฟีดแบค
-        // หรือจะใช้ localStorage.clear() เลยก็ได้ถ้าไม่มีข้อมูลแอพอื่น
     }
 
     const checkData = JSON.parse(localStorage.getItem(APP_KEY));
@@ -179,9 +178,16 @@
         }
         const bmi = (weight / Math.pow(height / 100, 2)).toFixed(1);
         let currentData = JSON.parse(localStorage.getItem(APP_KEY)) || {};
-        const oldDarkMode = currentData.user ? currentData.user.darkMode : false;
 
-        currentData.user = { name, age, gender: selectedGender, height, weight, goalWeight, bmi, darkMode: oldDarkMode };
+        // รักษาค่าเดิมไว้ (เช่น รูปโปรไฟล์, DarkMode)
+        const oldDarkMode = currentData.user ? currentData.user.darkMode : false;
+        const oldProfileImage = currentData.user ? currentData.user.profileImage : null;
+
+        currentData.user = {
+            name, age, gender: selectedGender, height, weight, goalWeight, bmi,
+            darkMode: oldDarkMode,
+            profileImage: oldProfileImage // ✅ เพิ่มบรรทัดนี้เพื่อไม่ให้รูปหาย
+        };
         localStorage.setItem(APP_KEY, JSON.stringify(currentData));
         window.location.href = "5.html";
     });
